@@ -8,13 +8,32 @@ on:
 jobs:
   checks:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: docflow
+          POSTGRES_PASSWORD: docflow
+          POSTGRES_DB: docflow_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U docflow -d docflow_test"
+          --health-interval 2s --health-timeout 3s --health-retries 15
+    env:
+      DOCFLOW_DATABASE_URL: postgresql+psycopg://docflow:docflow@localhost:5432/docflow_test
     steps:
       - uses: actions/checkout@v7
       - uses: astral-sh/setup-uv@v10.3.3
       - run: uv sync --frozen
       - run: uv run ruff check .
       - run: uv run ruff format --check .
-      - run: uv run mypy src tests
+      - run: uv run mypy src tests alembic
+      - name: Migrations apply, match the models and roll back
+        run: |
+          uv run alembic upgrade head
+          uv run alembic check
+          uv run alembic downgrade base
       - run: uv run pytest
 
   docker:
@@ -22,13 +41,14 @@ jobs:
     needs: checks
     steps:
       - uses: actions/checkout@v7
-      - run: docker build -t docflow:ci .
-      - name: Smoke test the image
+      - name: Create .env with a throwaway secret
+        run: echo "DOCFLOW_JWT_SECRET=$(openssl rand -base64 48)" > .env
+      - name: Start the full stack (db, migrate, api) and wait for health checks
+        run: docker compose up --build --detach --wait
+      - name: Smoke test
         run: |
-          docker run -d --name docflow -p 8000:8000 docflow:ci
-          for i in $(seq 1 20); do
-            curl -fsS http://localhost:8000/health && exit 0
-            sleep 1
-          done
-          docker logs docflow
-          exit 1
+          curl -fsS http://localhost:8000/health
+          curl -fsS http://localhost:8000/ready
+      - name: Logs on failure
+        if: failure()
+        run: docker compose logs

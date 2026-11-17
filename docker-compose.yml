@@ -1,11 +1,53 @@
-# Services are added in the milestone that first needs them (Postgres in M1, Redis/MinIO in M2).
+# Local stack. Services are added in the milestone that first needs them (Redis/MinIO in M2).
+# Requires a .env file next to this one (copy .env.example).
+
+x-app-env: &app-env
+  DOCFLOW_ENVIRONMENT: docker
+  DOCFLOW_DATABASE_URL: postgresql+psycopg://docflow:docflow@db:5432/docflow
+  DOCFLOW_JWT_SECRET: ${DOCFLOW_JWT_SECRET:?Set DOCFLOW_JWT_SECRET in .env (see .env.example)}
+
 services:
+  db:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: docflow
+      POSTGRES_PASSWORD: docflow
+      POSTGRES_DB: docflow
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      # Runs only when the volume is first created: adds the docflow_test database.
+      - ./docker/postgres-init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U docflow -d docflow"]
+      interval: 2s
+      timeout: 3s
+      retries: 15
+
+  # Runs migrations once, then exits. The API only starts if this succeeds,
+  # so several API replicas never race to migrate the same database.
+  migrate:
+    build: .
+    command: ["alembic", "upgrade", "head"]
+    environment: *app-env
+    depends_on:
+      db:
+        condition: service_healthy
+
   api:
     build: .
     ports:
       - "8000:8000"
-    env_file:
-      - path: .env
-        required: false
-    environment:
-      DOCFLOW_ENVIRONMENT: docker
+    environment: *app-env
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/ready')"]
+      interval: 3s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  pgdata:
