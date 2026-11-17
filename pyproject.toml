@@ -6,12 +6,15 @@ readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "alembic>=1.20.1",
+    "boto3>=1.44.4",
+    "celery[redis]>=5.7.0",
     "email-validator>=2.4.0",
     "fastapi>=0.163.1",
     "psycopg[binary]>=3",
     "pwdlib[argon2]>=0.4.2",
     "pydantic-settings>=2.16.3",
     "pyjwt>=2.15.1",
+    "pypdf>=7.1.0",
     "python-multipart>=0.0.34",
     "sqlalchemy>=2",
     "uvicorn[standard]>=0.54.0",
@@ -35,11 +38,22 @@ select = ["E", "F", "I", "B", "UP", "SIM", "RUF"]
 strict = true
 plugins = ["pydantic.mypy"]
 
+# Celery ships no type information. Treat it as untyped, and allow its task decorator
+# only in the worker module, so strict typing still applies everywhere else.
+[[tool.mypy.overrides]]
+module = ["celery", "celery.*"]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = ["docflow.worker"]
+disallow_untyped_decorators = false
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 
 [dependency-groups]
 dev = [
+    "boto3-stubs[s3]>=1.44.4",
     "httpx>=0.28.1",
     "mypy>=2.4.1",
     "pytest>=9.2.0",

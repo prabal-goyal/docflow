@@ -46,7 +46,7 @@ UPLOADED -> EXTRACTING -> EXTRACTION_FAILED (admin retry)
 
 ## Extraction
 
-1. PDF is sent to Claude; output must match a Pydantic schema (invoice number/date, supplier, buyer,
+1. PDF is sent to OpenAI (Responses API, structured outputs); output must match a Pydantic schema (invoice number/date, supplier, buyer,
    countries, currency, line items with description, HS code, quantity, unit price, amount; subtotal, total).
 2. Every field includes a verbatim source quote.
 3. Invalid output: retry once with the validation error; then `EXTRACTION_FAILED`.
@@ -97,7 +97,9 @@ GET    /health, /ready
 ## Stack
 
 Python 3.12+, FastAPI, Pydantic v2, uv, ruff, mypy (strict), pytest, PostgreSQL, SQLAlchemy 2, Alembic,
-Celery + Redis, S3 (MinIO locally), Anthropic Claude, Docker + docker compose, GitHub Actions.
+Celery + Redis, S3 (SeaweedFS locally; MinIO stopped publishing free images in 2025),
+OpenAI API (starting model `gpt-6.1-sol`; final choice decided by the M5 eval), Docker + docker compose,
+GitHub Actions.
 
 ## Deployment (AWS)
 
@@ -127,7 +129,9 @@ verification sample), `docs/runbook.md`, `docs/decisions/`.
 | M7 | Docs and demo | 19-21 | Handover docs, 3-minute demo video, resume bullet |
 | Stretch | MCP server, Terraform, small review UI | after | Only when M0-M7 are done |
 
-Infrastructure is added in the milestone that first uses it (Postgres in M1, Redis/MinIO in M2).
+Infrastructure is added in the milestone that first uses it (Postgres in M1, Redis/SeaweedFS in M2).
+M2 is split into M2a (upload, storage, worker plumbing with a fake extractor) and M2b (OpenAI
+extraction and checks).
 
 ## Testing
 
@@ -137,7 +141,7 @@ real Postgres. A fake LLM client in tests, so CI never calls the real API.
 ## Prerequisites
 
 1. Docker Desktop (WSL2)
-2. Anthropic API key with a spend limit (M2)
+2. OpenAI API key in a dedicated project with a budget limit (M2b)
 3. AWS account with a budget alert (M6)
 4. Public GitHub repo `docflow`
 

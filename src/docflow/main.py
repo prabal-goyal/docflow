@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 
-from docflow.api import auth, health, users
+from docflow.api import auth, health, submissions, users
 from docflow.config import get_settings
 
 
@@ -10,6 +10,7 @@ def create_app() -> FastAPI:
     app.include_router(health.router)
     app.include_router(auth.router)
     app.include_router(users.router)
+    app.include_router(submissions.router)
     return app
 
 

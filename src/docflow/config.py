@@ -22,6 +22,17 @@ class Settings(BaseSettings):
     jwt_secret: SecretStr = Field(min_length=MIN_JWT_SECRET_LENGTH)
     access_token_minutes: int = Field(default=30, gt=0)
 
+    redis_url: str = "redis://localhost:6379/0"
+
+    # S3 credentials are NOT settings: boto3 reads them from the standard AWS sources
+    # (AWS_ACCESS_KEY_ID / AWS_SECRET_ACCESS_KEY locally, the instance's IAM role on AWS).
+    s3_bucket: str = "docflow-documents"
+    s3_region: str = "us-east-1"
+    s3_endpoint_url: str | None = None  # set for a local S3-compatible server; None means AWS S3
+
+    max_upload_bytes: int = Field(default=10 * 1024 * 1024, gt=0)
+    max_pdf_pages: int = Field(default=20, gt=0)
+
 
 @lru_cache
 def get_settings() -> Settings:

@@ -1,9 +1,10 @@
 import uuid
 from datetime import datetime
+from typing import Any
 
 from pydantic import BaseModel, ConfigDict, EmailStr, Field, SecretStr, field_validator
 
-from docflow.models import Role
+from docflow.models import Role, SubmissionStatus
 
 MIN_PASSWORD_LENGTH = 12
 MAX_PASSWORD_LENGTH = 128
@@ -46,3 +47,24 @@ class Token(BaseModel):
 class ChangePasswordRequest(BaseModel):
     current_password: SecretStr
     new_password: SecretStr = Field(min_length=MIN_PASSWORD_LENGTH, max_length=MAX_PASSWORD_LENGTH)
+
+
+class DocumentOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    sha256: str
+    size_bytes: int
+    page_count: int | None
+
+
+class SubmissionOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: uuid.UUID
+    status: SubmissionStatus
+    stage: int | None
+    failure_reason: str | None
+    fields: dict[str, Any] | None
+    document: DocumentOut
+    created_at: datetime
+    updated_at: datetime

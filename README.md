@@ -4,7 +4,7 @@ AI document intake and approval API. Upload a commercial invoice; an LLM extract
 deterministic checks flag anything suspicious, reviewers approve in stages with field-level queries,
 and the customer's system is notified through signed webhooks.
 
-Status: **M1 (data and auth)** done. See [docs/PLAN.md](docs/PLAN.md) for the full plan.
+Status: **M2a (upload, storage, background worker)** done; OpenAI extraction (M2b) next. See [docs/PLAN.md](docs/PLAN.md) for the full plan.
 
 ## Run with Docker
 
@@ -16,7 +16,18 @@ python3 -c "import secrets; print(secrets.token_urlsafe(48))"
 docker compose up --build
 ```
 
-Compose starts Postgres, runs migrations once in the `migrate` service, and only then starts the API.
+| Service | Role |
+|---|---|
+| `db` | Postgres |
+| `redis` | Celery broker |
+| `storage` | S3-compatible object storage (SeaweedFS) for uploaded PDFs |
+| `migrate` | Runs migrations and creates the bucket once, then exits |
+| `api` | FastAPI on http://localhost:8000 |
+| `worker` | Celery worker that processes uploads |
+
+The API and worker start only after `migrate` succeeds.
+
+`scripts/smoke_test.sh` runs an end-to-end check against a fresh stack (CI runs it too).
 
 Create the first admin (prompts for a password):
 
@@ -34,7 +45,7 @@ Application Control blocks the compiled extensions that SQLAlchemy and other lib
 
 ```bash
 export UV_PROJECT_ENVIRONMENT=.venv-linux   # keeps the Linux venv separate from any Windows one
-docker compose up -d db                     # Postgres, including the docflow_test database
+docker compose up -d db redis storage       # Postgres (incl. docflow_test), Redis, object storage
 uv sync
 uv run alembic upgrade head
 uv run uvicorn docflow.main:app --reload
@@ -67,3 +78,14 @@ uv run pytest                 # needs the db service running; wipes only docflow
 
 See [docs/decisions/0001-production-readiness-auth.md](docs/decisions/0001-production-readiness-auth.md)
 for what is production-grade and what is deliberately left out.
+
+## Submissions
+
+- `POST /submissions` (submitter, admin): multipart upload of one PDF, up to 10 MB. Returns
+  `202` with status `uploaded`; extraction runs in the background. An optional
+  `Idempotency-Key` header makes retries safe.
+- `GET /submissions/{id}`: submitters see their own; reviewers, approvers and admins see all.
+
+Lifecycle so far: `uploaded -> extracting -> in_review (stage 1)` or `extraction_failed` with a
+`failure_reason`. See [docs/decisions/0002-background-extraction.md](docs/decisions/0002-background-extraction.md)
+for how duplicate deliveries, crashed workers and retries are handled.

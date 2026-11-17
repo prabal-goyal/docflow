@@ -4,6 +4,7 @@ from pathlib import Path
 
 import pytest
 from alembic.config import Config
+from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from sqlalchemy import Engine, create_engine, make_url, text
 from sqlalchemy.orm import Session
@@ -21,9 +22,12 @@ os.environ["DOCFLOW_DATABASE_URL"] = TEST_DATABASE_URL
 os.environ["DOCFLOW_JWT_SECRET"] = TEST_JWT_SECRET
 
 from docflow.db import get_db  # noqa: E402  (must import after the environment is set)
+from docflow.jobs import get_enqueue  # noqa: E402
 from docflow.main import create_app  # noqa: E402
 from docflow.models import Role, User  # noqa: E402
 from docflow.security import hash_password  # noqa: E402
+from docflow.storage import get_storage  # noqa: E402
+from tests.fakes import InMemoryStorage, RecordingQueue  # noqa: E402
 
 DEFAULT_PASSWORD = "correct-horse-battery-staple"
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
@@ -62,9 +66,28 @@ def db(engine: Engine) -> Iterator[Session]:
 
 
 @pytest.fixture
-def client(db: Session) -> Iterator[TestClient]:
+def storage() -> InMemoryStorage:
+    return InMemoryStorage()
+
+
+@pytest.fixture
+def job_queue() -> RecordingQueue:
+    return RecordingQueue()
+
+
+@pytest.fixture
+def app(db: Session, storage: InMemoryStorage, job_queue: RecordingQueue) -> FastAPI:
+    """The real app wired to the test database and to in-memory storage and queue.
+    Tests can add further dependency_overrides (e.g. settings) before making requests."""
     app = create_app()
     app.dependency_overrides[get_db] = lambda: db
+    app.dependency_overrides[get_storage] = lambda: storage
+    app.dependency_overrides[get_enqueue] = lambda: job_queue
+    return app
+
+
+@pytest.fixture
+def client(app: FastAPI) -> Iterator[TestClient]:
     with TestClient(app) as test_client:
         yield test_client
 
@@ -94,7 +117,8 @@ def make_user(db: Session) -> MakeUser:
             must_change_password=must_change_password,
         )
         db.add(user)
-        db.flush()
+        # Committed like real users, so a rollback inside the code under test cannot remove it.
+        db.commit()
         return user
 
     return _make_user
