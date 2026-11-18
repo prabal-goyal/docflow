@@ -4,7 +4,7 @@ AI document intake and approval API. Upload a commercial invoice; an LLM extract
 deterministic checks flag anything suspicious, reviewers approve in stages with field-level queries,
 and the customer's system is notified through signed webhooks.
 
-Status: **M3 (review workflow)** done; webhooks (M4) next. See [docs/PLAN.md](docs/PLAN.md) for the full plan.
+Status: **M4 (webhooks)** done; evaluation (M5) next. See [docs/PLAN.md](docs/PLAN.md) for the full plan.
 
 ## Run with Docker
 
@@ -23,7 +23,9 @@ docker compose up --build
 | `storage` | S3-compatible object storage (SeaweedFS) for uploaded PDFs |
 | `migrate` | Runs migrations and creates the bucket once, then exits |
 | `api` | FastAPI on http://localhost:8000 |
-| `worker` | Celery worker that processes uploads |
+| `worker` | Celery worker that processes uploads and sends webhooks |
+| `scheduler` | Celery beat: triggers webhook dispatch every 10 seconds |
+| `receiver` | Mock customer system for webhooks, on http://localhost:9000/received |
 
 The API and worker start only after `migrate` succeeds.
 
@@ -142,3 +144,17 @@ Stage roles are configurable (`DOCFLOW_APPROVAL_STAGES`).
 
 Admins cannot approve or reject, and nobody can review their own submission. See
 [docs/decisions/0004-review-workflow.md](docs/decisions/0004-review-workflow.md).
+
+## Webhooks
+
+DocFlow notifies a customer's system on `submission.approved`, `submission.rejected`,
+`submission.query_raised` and `submission.extraction_failed`. Events are written to an outbox in
+the same transaction as the change and sent with HMAC-SHA256 signatures, retries over about 15
+hours, and SSRF protection on the target URL.
+
+Admin endpoints: `POST/GET /webhooks`, `PATCH /webhooks/{id}`, `POST /webhooks/{id}/rotate-secret`,
+`POST /webhooks/{id}/test`, `GET /webhooks/{id}/deliveries`,
+`POST /webhook-deliveries/{id}/redeliver`.
+
+For receivers: [docs/integration-guide.md](docs/integration-guide.md) (signature verification in
+Python and Node.js). Design: [docs/decisions/0005-webhooks.md](docs/decisions/0005-webhooks.md).

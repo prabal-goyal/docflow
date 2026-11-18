@@ -19,6 +19,7 @@ from docflow.errors import InvalidRequestError, NotFoundError
 from docflow.invoice import InvoiceExtraction
 from docflow.jobs import EnqueueExtraction
 from docflow.models import FieldQuery, QueryStatus, Role, Submission, SubmissionStatus, User
+from docflow.webhooks import WebhookEventType, emit, submission_data
 from docflow.workflow import Action, Actor, InvalidTransitionError, State, transition
 
 logger = logging.getLogger(__name__)
@@ -174,6 +175,11 @@ def raise_queries(
             ]
         },
     )
+    emit(
+        db,
+        WebhookEventType.SUBMISSION_QUERY_RAISED,
+        submission_data(submission, fields=[str(path) for path in paths]),
+    )
     db.commit()
     return submission
 
@@ -270,6 +276,10 @@ def decide(
         stage=before.stage,
         details={"comment": comment, "flags_acknowledged": flag_count if approve else 0},
     )
+    if event == AuditAction.APPROVED:
+        emit(db, WebhookEventType.SUBMISSION_APPROVED, submission_data(submission))
+    elif event == AuditAction.REJECTED:
+        emit(db, WebhookEventType.SUBMISSION_REJECTED, submission_data(submission))
     db.commit()
     return submission
 

@@ -3,13 +3,15 @@
 import logging
 import uuid
 
+import httpx2
 from celery import Task
 from sqlalchemy.orm import Session
 
 from docflow.config import get_settings
 from docflow.db import get_engine
+from docflow.dispatch import dispatch_due
 from docflow.extraction import RetryableExtractionError
-from docflow.jobs import EXTRACT_TASK, get_celery
+from docflow.jobs import DISPATCH_WEBHOOKS_TASK, EXTRACT_TASK, get_celery
 from docflow.openai_extractor import get_extractor
 from docflow.pipeline import CLAIM_LEASE, ClaimBusyError, give_up, process_submission
 from docflow.storage import StorageError, get_s3_storage
@@ -41,3 +43,10 @@ def extract_submission(self: Task, submission_id: str) -> None:
             raise self.retry(
                 exc=error, countdown=RETRY_BASE_SECONDS * 2**self.request.retries
             ) from error
+
+
+@celery_app.task(name=DISPATCH_WEBHOOKS_TASK)
+def dispatch_webhooks() -> int:
+    """Sends due webhook deliveries. Overlapping runs are safe: claims use SKIP LOCKED."""
+    with httpx2.Client() as client:
+        return dispatch_due(lambda: Session(get_engine()), client, get_settings())

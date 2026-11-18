@@ -5,7 +5,8 @@ from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, EmailStr, Field, SecretStr, field_validator
 
-from docflow.models import AttemptOutcome, QueryStatus, Role, SubmissionStatus
+from docflow.models import AttemptOutcome, DeliveryStatus, QueryStatus, Role, SubmissionStatus
+from docflow.webhooks import WebhookEventType
 
 MIN_PASSWORD_LENGTH = 12
 MAX_PASSWORD_LENGTH = 128
@@ -168,4 +169,64 @@ class ExtractionAttemptOut(BaseModel):
     latency_ms: int
     response_id: str | None
     error: str | None
+    created_at: datetime
+
+
+class WebhookEndpointIn(BaseModel):
+    url: str = Field(min_length=1, max_length=2048)
+    event_types: list[WebhookEventType] = Field(min_length=1)
+    description: str | None = Field(default=None, max_length=255)
+
+    @field_validator("event_types")
+    @classmethod
+    def no_test_events(cls, types: list[WebhookEventType]) -> list[WebhookEventType]:
+        if WebhookEventType.TEST in types:
+            raise ValueError("webhook.test is sent on request only and cannot be subscribed to")
+        return sorted(set(types))
+
+
+class WebhookEndpointUpdate(BaseModel):
+    url: str | None = Field(default=None, min_length=1, max_length=2048)
+    event_types: list[WebhookEventType] | None = Field(default=None, min_length=1)
+    active: bool | None = None
+    description: str | None = Field(default=None, max_length=255)
+
+    @field_validator("event_types")
+    @classmethod
+    def no_test_events(cls, types: list[WebhookEventType] | None) -> list[WebhookEventType] | None:
+        if types is not None and WebhookEventType.TEST in types:
+            raise ValueError("webhook.test cannot be subscribed to")
+        return None if types is None else sorted(set(types))
+
+
+class WebhookEndpointOut(BaseModel):
+    """No secret here: it is shown once, at creation or rotation."""
+
+    model_config = ConfigDict(from_attributes=True)
+
+    id: uuid.UUID
+    url: str
+    event_types: list[str]
+    active: bool
+    description: str | None
+    created_at: datetime
+    updated_at: datetime
+
+
+class WebhookEndpointWithSecret(WebhookEndpointOut):
+    secret: str
+
+
+class WebhookDeliveryOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: uuid.UUID
+    event_id: uuid.UUID
+    endpoint_id: uuid.UUID
+    status: DeliveryStatus
+    attempt_count: int
+    next_attempt_at: datetime
+    last_status_code: int | None
+    last_error: str | None
+    delivered_at: datetime | None
     created_at: datetime

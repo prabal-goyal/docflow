@@ -43,6 +43,11 @@ class Settings(BaseSettings):
     # An upload still UPLOADED after this long was probably never queued (broker outage).
     stuck_upload_minutes: int = Field(default=10, gt=0)
 
+    # Local development only: lets webhooks reach a receiver inside Docker over http. Never set
+    # this in production; it disables the SSRF protection.
+    webhook_allow_private_targets: bool = False
+    webhook_timeout_seconds: float = Field(default=10, gt=0)
+
     # Read from the standard OPENAI_API_KEY variable (no DOCFLOW_ prefix). Only the worker needs it.
     openai_api_key: SecretStr | None = Field(default=None, validation_alias="OPENAI_API_KEY")
     llm_model: str = "gpt-6-luna"

@@ -25,6 +25,7 @@ from docflow.jobs import TASK_TIME_LIMIT_SECONDS
 from docflow.models import AttemptOutcome, ExtractionAttempt, Submission, SubmissionStatus
 from docflow.pdf import InvalidPdfError, inspect_pdf
 from docflow.storage import ObjectStorage, StorageError
+from docflow.webhooks import WebhookEventType, emit, submission_data
 
 logger = logging.getLogger(__name__)
 
@@ -181,6 +182,11 @@ def fail(db: Session, submission: Submission, reason: str) -> None:
     record_event(
         db, submission.id, AuditAction.EXTRACTION_FAILED, actor_id=None, details={"reason": reason}
     )
+    emit(
+        db,
+        WebhookEventType.SUBMISSION_EXTRACTION_FAILED,
+        submission_data(submission, failure_reason=reason),
+    )
     db.commit()
 
 
@@ -211,4 +217,11 @@ def give_up(db: Session, submission_id: uuid.UUID, reason: str) -> None:
             actor_id=None,
             details={"reason": reason},
         )
+        data = {
+            "submission_id": str(submission_id),
+            "status": SubmissionStatus.EXTRACTION_FAILED.value,
+            "stage": None,
+            "failure_reason": reason,
+        }
+        emit(db, WebhookEventType.SUBMISSION_EXTRACTION_FAILED, data)
     db.commit()

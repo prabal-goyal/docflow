@@ -10,6 +10,9 @@ from celery import Celery
 from docflow.config import get_settings
 
 EXTRACT_TASK = "docflow.extract_submission"
+DISPATCH_WEBHOOKS_TASK = "docflow.dispatch_webhooks"
+# How often the scheduler sends due webhook deliveries; also the worst-case added delay.
+WEBHOOK_DISPATCH_INTERVAL_SECONDS = 10.0
 
 # Hard ceiling on one task, including parsing an untrusted PDF and the LLM call.
 TASK_SOFT_TIME_LIMIT_SECONDS = 300
@@ -30,6 +33,15 @@ def get_celery() -> Celery:
         task_soft_time_limit=TASK_SOFT_TIME_LIMIT_SECONDS,
         task_time_limit=TASK_TIME_LIMIT_SECONDS,
         broker_connection_retry_on_startup=True,
+        # Run by the `scheduler` service (celery beat), executed by the worker.
+        beat_schedule={
+            "dispatch-webhooks": {
+                "task": DISPATCH_WEBHOOKS_TASK,
+                "schedule": WEBHOOK_DISPATCH_INTERVAL_SECONDS,
+                # A missed run is pointless: the next one picks up everything that is due.
+                "options": {"expires": WEBHOOK_DISPATCH_INTERVAL_SECONDS},
+            }
+        },
     )
     return app
 

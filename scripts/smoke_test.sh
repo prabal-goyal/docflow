@@ -33,6 +33,12 @@ curl -fsS -X POST "$BASE_URL/auth/change-password" \
   -d "{\"current_password\":\"$TEMP_PASSWORD\",\"new_password\":\"$SUBMITTER_PASSWORD\"}"
 TOKEN=$(login "$SUBMITTER_EMAIL" "$SUBMITTER_PASSWORD")
 
+echo "2b. Admin registers the mock receiver for extraction failures"
+WEBHOOK_SECRET=$(curl -fsS -X POST "$BASE_URL/webhooks" \
+  -H "Authorization: Bearer $ADMIN_TOKEN" -H "Content-Type: application/json" \
+  -d '{"url":"http://receiver:9000/hook","event_types":["submission.extraction_failed"]}' \
+  | json "['secret']")
+
 echo "3. Upload a PDF"
 SUBMISSION_ID=$(curl -fsS -X POST "$BASE_URL/submissions" \
   -H "Authorization: Bearer $TOKEN" -H "Idempotency-Key: smoke-1" \
@@ -72,5 +78,27 @@ if [[ "$STATUS" == "extraction_failed" ]]; then
     echo "FAILED: unexpected audit trail"
     exit 1
   fi
+
+  echo "6. Wait for both signed webhooks at the mock receiver (dispatch runs every 10s)"
+  for _ in $(seq 1 45); do
+    COUNT=$(curl -fsS "${RECEIVER_URL:-http://localhost:9000}/received" | python3 -c "import sys, json; print(len(json.load(sys.stdin)))")
+    if [[ "$COUNT" -ge 2 ]]; then break; fi
+    sleep 1
+  done
+  curl -fsS "${RECEIVER_URL:-http://localhost:9000}/received" | WEBHOOK_SECRET="$WEBHOOK_SECRET" SUBMISSION_ID="$SUBMISSION_ID" python3 -c '
+import hashlib, hmac, json, os, sys
+secret, sid = os.environ["WEBHOOK_SECRET"], os.environ["SUBMISSION_ID"]
+received = json.load(sys.stdin)
+assert len(received) == 2, f"expected 2 webhooks, got {len(received)}"
+for item in received:
+    body = item["body"].encode()
+    digest = hmac.new(secret.encode(), item["timestamp"].encode() + b"." + body, hashlib.sha256).hexdigest()
+    assert hmac.compare_digest("v1=" + digest, item["signature"]), "bad signature"
+    event = json.loads(body)
+    assert event["type"] == "submission.extraction_failed", event["type"]
+    assert event["data"]["submission_id"] == sid
+assert len({item["event_id"] for item in received}) == 2, "event ids must be distinct"
+print("   2 webhooks received, signatures valid, distinct event ids")
+'
 fi
 echo "Smoke test passed"

@@ -11,6 +11,9 @@ x-app-env: &app-env
   AWS_SECRET_ACCESS_KEY: docflow-local-secret
   # Empty when unset (as in CI): extraction then fails with a clear reason instead of calling OpenAI.
   OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+  # LOCAL ONLY: lets webhooks reach the mock receiver over http inside Docker. This disables the
+  # SSRF protection and must never be set in production.
+  DOCFLOW_WEBHOOK_ALLOW_PRIVATE_TARGETS: "true"
 
 services:
   db:
@@ -90,6 +93,26 @@ services:
         condition: service_completed_successfully
       redis:
         condition: service_healthy
+
+  # Celery beat: triggers webhook dispatch every few seconds; the worker does the sending.
+  scheduler:
+    build: .
+    command: ["celery", "-A", "docflow.worker", "beat", "--loglevel=INFO", "--schedule", "/tmp/celerybeat-schedule"]
+    environment: *app-env
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      redis:
+        condition: service_healthy
+
+  # Mock customer system for local development and the smoke test (scripts/webhook_receiver.py).
+  receiver:
+    image: python:3.13-slim
+    command: ["python", "/app/webhook_receiver.py"]
+    volumes:
+      - ./scripts/webhook_receiver.py:/app/webhook_receiver.py:ro
+    ports:
+      - "9000:9000"
 
 volumes:
   pgdata:

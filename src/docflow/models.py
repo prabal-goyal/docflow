@@ -214,3 +214,61 @@ class AuditEvent(Base):
     stage: Mapped[int | None] = mapped_column(Integer)
     details: Mapped[dict[str, Any]] = mapped_column(JSONB, default=dict)
     created_at: Mapped[datetime] = event_time_column()
+
+
+class DeliveryStatus(StrEnum):
+    PENDING = "pending"
+    DELIVERING = "delivering"
+    SUCCEEDED = "succeeded"
+    FAILED = "failed"
+
+
+class WebhookEndpoint(Base):
+    __tablename__ = "webhook_endpoints"
+
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
+    url: Mapped[str] = mapped_column(String(2048))
+    # Kept readable because signing needs it. Stored unencrypted for now: see decision 0005.
+    secret: Mapped[str] = mapped_column(String(128))
+    event_types: Mapped[list[str]] = mapped_column(JSONB)
+    active: Mapped[bool] = mapped_column(default=True)
+    description: Mapped[str | None] = mapped_column(String(255))
+    created_at: Mapped[datetime] = created_at_column()
+    updated_at: Mapped[datetime] = updated_at_column()
+
+
+class WebhookEvent(Base):
+    """The outbox: written in the same transaction as the change it announces, never modified."""
+
+    __tablename__ = "webhook_events"
+
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
+    type: Mapped[str] = mapped_column(String(100))
+    payload: Mapped[dict[str, Any]] = mapped_column(JSONB)
+    created_at: Mapped[datetime] = event_time_column()
+
+
+class WebhookDelivery(Base):
+    """One event to one endpoint. next_attempt_at doubles as the claim lease while DELIVERING."""
+
+    __tablename__ = "webhook_deliveries"
+    __table_args__ = (Index("ix_webhook_deliveries_due", "status", "next_attempt_at"),)
+
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
+    event_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("webhook_events.id"))
+    endpoint_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("webhook_endpoints.id"), index=True)
+    status: Mapped[DeliveryStatus] = mapped_column(
+        pg_enum(DeliveryStatus, "delivery_status"), default=DeliveryStatus.PENDING
+    )
+    attempt_count: Mapped[int] = mapped_column(Integer, default=0)
+    next_attempt_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
+    last_status_code: Mapped[int | None] = mapped_column(Integer)
+    last_error: Mapped[str | None] = mapped_column(Text)
+    delivered_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    created_at: Mapped[datetime] = event_time_column()
+    updated_at: Mapped[datetime] = updated_at_column()
+
+    event: Mapped[WebhookEvent] = relationship()
+    endpoint: Mapped[WebhookEndpoint] = relationship()
