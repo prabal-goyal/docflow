@@ -1,10 +1,56 @@
 # DocFlow
 
-AI document intake and approval API. Upload a commercial invoice; an LLM extracts the fields,
-deterministic checks flag anything suspicious, reviewers approve in stages with field-level queries,
-and the customer's system is notified through signed webhooks.
+**LLM extraction is easy; trusting it is the hard part.** DocFlow is an API that takes a commercial
+invoice PDF, extracts its fields with an LLM, checks every value against the document and against
+arithmetic and format rules, routes it through staged human approval, and notifies the customer's
+system with signed webhooks.
 
-Status: **M6 (AWS deployment)** live at https://35-154-192-199.sslip.io; handover docs and demo (M7) next. See [docs/PLAN.md](docs/PLAN.md) for the full plan.
+**Live:** [API docs (Swagger UI)](https://35-154-192-199.sslip.io/docs) ·
+[Integration guide](docs/integration-guide.md) · [Deployment guide](docs/deployment-guide.md) ·
+[Runbook](docs/runbook.md) · [Eval results](evals/results.md) · [Design decisions](docs/decisions/)
+
+| | |
+|---|---|
+| **Verified extraction** | Every field comes with the exact quote it was read from, and the quote is checked against the PDF's text. Totals, line amounts, HS codes, currencies and dates are checked in code, not by the model |
+| **Measured** | Held-out eval on synthetic invoices: 100% field accuracy and 100% of planted problems caught, at about $0.0007 per invoice and 10 s median. The cheapest model matched ones 7-16x more expensive |
+| **Human review** | Two approval stages with separation of duties, field-level queries back to the submitter, and an append-only audit log enforced by a Postgres trigger |
+| **Integration** | Transactional outbox, HMAC-signed webhooks with retries over about 15 hours, SSRF and DNS-rebinding protection, KMS-encrypted signing secrets |
+| **Production** | AWS through Terraform, deploys from GitHub Actions with OIDC (no stored keys), no SSH, nightly backups with a tested restore, one-command rollback, and a second environment rebuilt from the deployment guide |
+| **Quality** | 735 tests, ruff, mypy (strict), migration drift check, Docker smoke test in CI |
+
+## How it works
+
+```mermaid
+flowchart LR
+    C[Customer system] -- "upload PDF" --> API[FastAPI]
+    API --> S3[(S3)]
+    API --> DB[(Postgres)]
+    API -- "job" --> Q[(Redis)]
+    Q --> W[Celery worker]
+    W -- "structured output" --> LLM[OpenAI]
+    W -- "fields, quotes, flags" --> DB
+    R[Reviewers] -- "query, edit, approve" --> API
+    DB -- "outbox" --> W
+    W -- "signed webhook" --> C
+```
+
+1. **Upload:** the API stores the PDF and returns `202`; a worker picks the job up.
+2. **Extract:** the model returns every field with its source quote (structured output).
+3. **Check:** code verifies the quotes against the PDF and runs arithmetic and format checks; failures
+   become flags for the reviewer instead of silently wrong data.
+4. **Review:** stage 1 and stage 2 reviewers edit, query the submitter or decide; everything is audited.
+5. **Notify:** decisions are written to an outbox in the same transaction and delivered as signed
+   webhooks.
+
+## Known limitations
+
+- Evaluated on 30 synthetic invoices, not customer data; the set is too easy to separate the models
+  (details in [evals/results.md](evals/results.md)).
+- API only; the demo is the Swagger UI.
+- One EC2 instance runs the whole stack; the upgrade path (ECS, RDS, alarms) is in
+  [decision 0007](docs/decisions/0007-aws-deployment.md).
+
+Built as a personal project, milestone by milestone: [docs/PLAN.md](docs/PLAN.md).
 
 ## Run with Docker
 
