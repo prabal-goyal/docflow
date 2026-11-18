@@ -228,8 +228,8 @@ class WebhookEndpoint(Base):
 
     id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
     url: Mapped[str] = mapped_column(String(2048))
-    # Kept readable because signing needs it. Stored unencrypted for now: see decision 0005.
-    secret: Mapped[str] = mapped_column(String(128))
+    # Encrypted with KMS in production (secret_cipher.py); decrypted only to sign a delivery.
+    secret: Mapped[str] = mapped_column(Text)
     event_types: Mapped[list[str]] = mapped_column(JSONB)
     active: Mapped[bool] = mapped_column(default=True)
     description: Mapped[str | None] = mapped_column(String(255))

@@ -105,6 +105,19 @@ services:
       redis:
         condition: service_healthy
 
+  # HTTPS in front of the API, same Caddyfile as production: https://localhost:8443
+  proxy:
+    image: caddy:2.11.8
+    environment:
+      DOCFLOW_SITE_ADDRESS: localhost
+    ports:
+      - "8443:443"
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+    depends_on:
+      api:
+        condition: service_healthy
+
   # Mock customer system for local development and the smoke test (scripts/webhook_receiver.py).
   receiver:
     image: python:3.13-slim

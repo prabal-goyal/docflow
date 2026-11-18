@@ -28,6 +28,7 @@ from docflow.models import (
     WebhookEndpoint,
     WebhookEvent,
 )
+from docflow.secret_cipher import PlainCipher
 from docflow.webhooks import WebhookEventType, emit, verify
 from tests.conftest import LoginAs, MakeUser
 from tests.invoices import SAMPLE_TEXT, make_invoice
@@ -270,7 +271,9 @@ def queued(db: Session, endpoint: WebhookEndpoint) -> WebhookDelivery:
 
 
 def run_dispatch(db: Session, receiver: FakeReceiver, settings: Settings = SETTINGS) -> int:
-    return dispatch_due(lambda: nullcontext(db), receiver.client(), settings, public_dns)
+    return dispatch_due(
+        lambda: nullcontext(db), receiver.client(), settings, PlainCipher(), public_dns
+    )
 
 
 def test_successful_delivery_is_signed_and_verifiable(db: Session) -> None:
@@ -386,7 +389,11 @@ def test_target_is_rechecked_before_every_send(db: Session) -> None:
     receiver = FakeReceiver()
 
     dispatch_due(
-        lambda: nullcontext(db), receiver.client(), SETTINGS, lambda h: ["169.254.169.254"]
+        lambda: nullcontext(db),
+        receiver.client(),
+        SETTINGS,
+        PlainCipher(),
+        lambda h: ["169.254.169.254"],
     )
 
     db.refresh(delivery)
@@ -425,3 +432,16 @@ def test_admin_sees_the_delivery_log(
 
     assert entry["status"] == "succeeded"
     assert entry["last_status_code"] == 204
+
+
+def test_stored_secret_is_not_the_one_returned(
+    db: Session, client: TestClient, admin_headers: dict[str, str]
+) -> None:
+    body = {"url": URL, "event_types": ["submission.approved"]}
+    created = client.post("/webhooks", json=body, headers=admin_headers).json()
+
+    stored = db.get(WebhookEndpoint, uuid.UUID(created["id"]))
+
+    assert stored is not None
+    assert stored.secret != created["secret"]  # encrypted at rest (dev mode: "plain:" prefix)
+    assert stored.secret.endswith(created["secret"])

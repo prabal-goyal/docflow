@@ -6,11 +6,13 @@ from collections.abc import Callable
 from functools import lru_cache
 
 from celery import Celery
+from celery.schedules import crontab
 
 from docflow.config import get_settings
 
 EXTRACT_TASK = "docflow.extract_submission"
 DISPATCH_WEBHOOKS_TASK = "docflow.dispatch_webhooks"
+BACKUP_DATABASE_TASK = "docflow.backup_database"
 # How often the scheduler sends due webhook deliveries; also the worst-case added delay.
 WEBHOOK_DISPATCH_INTERVAL_SECONDS = 10.0
 
@@ -40,7 +42,12 @@ def get_celery() -> Celery:
                 "schedule": WEBHOOK_DISPATCH_INTERVAL_SECONDS,
                 # A missed run is pointless: the next one picks up everything that is due.
                 "options": {"expires": WEBHOOK_DISPATCH_INTERVAL_SECONDS},
-            }
+            },
+            # Nightly at 02:30 UTC (08:00 IST), a quiet time for Indian business hours.
+            "backup-database": {
+                "task": BACKUP_DATABASE_TASK,
+                "schedule": crontab(hour=2, minute=30),
+            },
         },
     )
     return app

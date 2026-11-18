@@ -18,6 +18,7 @@ from docflow.schemas import (
     WebhookEndpointUpdate,
     WebhookEndpointWithSecret,
 )
+from docflow.secret_cipher import SecretCipher, get_cipher
 from docflow.ssrf import Resolver, UnsafeUrlError, resolve_host, validate_target
 from docflow.webhooks import WebhookEventType, emit, new_secret
 
@@ -33,6 +34,13 @@ def get_resolver() -> Resolver:
 
 
 DnsResolver = Annotated[Resolver, Depends(get_resolver)]
+Cipher = Annotated[SecretCipher, Depends(get_cipher)]
+
+
+def with_secret(endpoint: WebhookEndpoint, secret: str) -> WebhookEndpointWithSecret:
+    """The one response that carries the plain secret (the database only has it encrypted)."""
+    public = WebhookEndpointOut.model_validate(endpoint).model_dump()
+    return WebhookEndpointWithSecret(**public, secret=secret)
 
 
 def check_url(url: str, settings: Settings, resolve: Resolver) -> None:
@@ -56,18 +64,20 @@ def create_endpoint(
     _admin: AdminUser,
     settings: AppSettings,
     resolve: DnsResolver,
+    cipher: Cipher,
 ) -> WebhookEndpointWithSecret:
     """Register a receiver. The signing secret is returned now and never again."""
     check_url(body.url, settings, resolve)
+    secret = new_secret()
     endpoint = WebhookEndpoint(
         url=body.url,
-        secret=new_secret(),
+        secret=cipher.encrypt(secret),
         event_types=[t.value for t in body.event_types],
         description=body.description,
     )
     db.add(endpoint)
     db.commit()
-    return WebhookEndpointWithSecret.model_validate(endpoint)
+    return with_secret(endpoint, secret)
 
 
 @router.get("/webhooks")
@@ -103,13 +113,14 @@ def update_endpoint(
 
 @router.post("/webhooks/{endpoint_id}/rotate-secret")
 def rotate_secret(
-    endpoint_id: uuid.UUID, db: DbSession, _admin: AdminUser
+    endpoint_id: uuid.UUID, db: DbSession, _admin: AdminUser, cipher: Cipher
 ) -> WebhookEndpointWithSecret:
     """Replace the signing secret. Deliveries sent from now on use the new one."""
     endpoint = get_endpoint(db, endpoint_id)
-    endpoint.secret = new_secret()
+    secret = new_secret()
+    endpoint.secret = cipher.encrypt(secret)
     db.commit()
-    return WebhookEndpointWithSecret.model_validate(endpoint)
+    return with_secret(endpoint, secret)
 
 
 @router.post("/webhooks/{endpoint_id}/test", status_code=status.HTTP_202_ACCEPTED)

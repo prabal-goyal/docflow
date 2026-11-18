@@ -12,11 +12,13 @@ from contextlib import AbstractContextManager
 from datetime import UTC, datetime, timedelta
 
 import httpx2
+from botocore.exceptions import BotoCoreError, ClientError
 from sqlalchemy import func, select, update
 from sqlalchemy.orm import Session
 
 from docflow.config import Settings
 from docflow.models import DeliveryStatus, WebhookDelivery
+from docflow.secret_cipher import SecretCipher, SecretDecryptionError
 from docflow.ssrf import Resolver, UnsafeUrlError, resolve_host, validate_target
 from docflow.webhooks import canonical_body, sign
 
@@ -64,6 +66,7 @@ def deliver(
     delivery_id: uuid.UUID,
     client: httpx2.Client,
     settings: Settings,
+    cipher: SecretCipher,
     resolve: Resolver = resolve_host,
 ) -> DeliveryStatus | None:
     """Sends one claimed delivery. Returns its new status, or None if it was not ours to send."""
@@ -82,6 +85,16 @@ def deliver(
     except UnsafeUrlError as error:
         return finish(db, delivery, DeliveryStatus.FAILED, None, f"Unsafe target: {error}")
 
+    try:
+        secret = cipher.decrypt(endpoint.secret)
+    except SecretDecryptionError as error:
+        return finish(
+            db, delivery, DeliveryStatus.FAILED, None, f"Signing secret unusable: {error}"
+        )
+    except (BotoCoreError, ClientError) as error:
+        # KMS unreachable or throttled: transient, try again later.
+        return retry_or_fail(db, delivery, None, f"KMS error: {type(error).__name__}", now)
+
     body = canonical_body(delivery.event.payload)
     timestamp = int(time.time())
     headers = {
@@ -89,7 +102,7 @@ def deliver(
         "User-Agent": "DocFlow-Webhooks/1",
         "DocFlow-Event-Id": str(delivery.event_id),
         "DocFlow-Timestamp": str(timestamp),
-        "DocFlow-Signature": sign(endpoint.secret, timestamp, body),
+        "DocFlow-Signature": sign(secret, timestamp, body),
     }
     try:
         response = client.post(
@@ -141,6 +154,7 @@ def dispatch_due(
     open_session: Callable[[], AbstractContextManager[Session]],
     client: httpx2.Client,
     settings: Settings,
+    cipher: SecretCipher,
     resolve: Resolver = resolve_host,
 ) -> int:
     """Claims a batch and delivers each one in its own transaction. Returns how many were sent."""
@@ -149,7 +163,7 @@ def dispatch_due(
     for delivery_id in claimed:
         with open_session() as db:
             try:
-                deliver(db, delivery_id, client, settings, resolve)
+                deliver(db, delivery_id, client, settings, cipher, resolve)
             except Exception:
                 # Leave it DELIVERING: the lease expires and the next run retries it.
                 logger.exception("Unexpected error delivering webhook %s", delivery_id)

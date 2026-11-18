@@ -15,10 +15,16 @@ RUN uv sync --frozen --no-dev
 
 # Runtime stage: only the virtualenv and source, running as a non-root user.
 FROM python:3.13-slim
+# pg_dump/pg_restore for database backups; must match the server's major version (17).
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends postgresql-client-17 \
+    && rm -rf /var/lib/apt/lists/*
 RUN useradd --create-home --uid 1000 app
 WORKDIR /app
 COPY --from=build --chown=app:app /app /app
 ENV PATH="/app/.venv/bin:$PATH" PYTHONUNBUFFERED=1
 USER app
 EXPOSE 8000
-CMD ["uvicorn", "docflow.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# --proxy-headers: behind Caddy, use X-Forwarded-For for the client address (rate limiting).
+# Which proxies are trusted comes from FORWARDED_ALLOW_IPS (default: only 127.0.0.1).
+CMD ["uvicorn", "docflow.main:app", "--host", "0.0.0.0", "--port", "8000", "--proxy-headers"]

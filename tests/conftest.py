@@ -27,9 +27,11 @@ from docflow.db import get_db  # noqa: E402  (must import after the environment 
 from docflow.jobs import get_enqueue  # noqa: E402
 from docflow.main import create_app  # noqa: E402
 from docflow.models import Role, User  # noqa: E402
+from docflow.ratelimit import get_login_limiter  # noqa: E402
+from docflow.secret_cipher import PlainCipher, get_cipher  # noqa: E402
 from docflow.security import hash_password  # noqa: E402
 from docflow.storage import get_storage  # noqa: E402
-from tests.fakes import InMemoryStorage, RecordingQueue  # noqa: E402
+from tests.fakes import InMemoryLoginLimiter, InMemoryStorage, RecordingQueue  # noqa: E402
 
 DEFAULT_PASSWORD = "correct-horse-battery-staple"
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
@@ -78,13 +80,25 @@ def job_queue() -> RecordingQueue:
 
 
 @pytest.fixture
-def app(db: Session, storage: InMemoryStorage, job_queue: RecordingQueue) -> FastAPI:
+def login_limiter() -> InMemoryLoginLimiter:
+    return InMemoryLoginLimiter()
+
+
+@pytest.fixture
+def app(
+    db: Session,
+    storage: InMemoryStorage,
+    job_queue: RecordingQueue,
+    login_limiter: InMemoryLoginLimiter,
+) -> FastAPI:
     """The real app wired to the test database and to in-memory storage and queue.
     Tests can add further dependency_overrides (e.g. settings) before making requests."""
     app = create_app()
     app.dependency_overrides[get_db] = lambda: db
     app.dependency_overrides[get_storage] = lambda: storage
     app.dependency_overrides[get_enqueue] = lambda: job_queue
+    app.dependency_overrides[get_login_limiter] = lambda: login_limiter
+    app.dependency_overrides[get_cipher] = PlainCipher
     return app
 
 

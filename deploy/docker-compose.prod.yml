@@ -1,0 +1,111 @@
+# Production stack on one EC2 instance. Differences from the development compose file:
+# - images come from ECR (DOCFLOW_IMAGE), nothing is built on the server
+# - secrets come from /opt/docflow/docflow.env, rendered from SSM Parameter Store (render-env.sh)
+# - files go to real S3 and AWS access comes from the instance role: no endpoint, no keys
+# - only Caddy publishes ports; Postgres, Redis and the API are reachable inside Docker only
+# - no mock receiver, and private webhook targets are not allowed (the settings enforce it)
+# - logs go to CloudWatch Logs
+
+x-logging: &cloudwatch
+  driver: awslogs
+  options:
+    awslogs-region: ${AWS_REGION:?set AWS_REGION}
+    awslogs-group: /docflow
+    tag: "{{.Name}}"
+
+x-app: &app
+  image: ${DOCFLOW_IMAGE:?set DOCFLOW_IMAGE to the ECR image to run}
+  env_file:
+    - /opt/docflow/docflow.env
+  restart: unless-stopped
+  logging: *cloudwatch
+
+services:
+  caddy:
+    image: caddy:2.11.8
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      DOCFLOW_SITE_ADDRESS: ${DOCFLOW_SITE_ADDRESS:?set DOCFLOW_SITE_ADDRESS}
+    volumes:
+      - /opt/docflow/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data # certificates: losing them means re-issuing (rate-limited)
+    restart: unless-stopped
+    logging: *cloudwatch
+    depends_on:
+      api:
+        condition: service_healthy
+
+  db:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: docflow
+      POSTGRES_DB: docflow
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - /opt/docflow/postgres_password:/run/secrets/postgres_password:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U docflow -d docflow"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+    logging: *cloudwatch
+
+  redis:
+    image: redis:7.4-alpine
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+    logging: *cloudwatch
+
+  migrate:
+    <<: *app
+    command: ["alembic", "upgrade", "head"]
+    restart: "no"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  api:
+    <<: *app
+    environment:
+      # Only Caddy can reach the API (no published port), so its forwarded headers are trusted.
+      FORWARDED_ALLOW_IPS: "*"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/ready')"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      redis:
+        condition: service_healthy
+
+  worker:
+    <<: *app
+    command: ["celery", "-A", "docflow.worker", "worker", "--loglevel=INFO", "--concurrency=2"]
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      redis:
+        condition: service_healthy
+
+  scheduler:
+    <<: *app
+    command: ["celery", "-A", "docflow.worker", "beat", "--loglevel=INFO", "--schedule", "/tmp/celerybeat-schedule"]
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      redis:
+        condition: service_healthy
+
+volumes:
+  pgdata:
+  caddy_data:

@@ -1,0 +1,28 @@
+# Reverse proxy in front of the API, used locally and in production. Caddy obtains and renews the
+# HTTPS certificate on its own: from Let's Encrypt for a public hostname, or from its internal CA
+# for "localhost" during development.
+{
+	admin off
+}
+
+{$DOCFLOW_SITE_ADDRESS} {
+	# Hard cap on request size before anything reaches the API (uploads are limited to 10 MB).
+	request_body {
+		max_size 11MB
+	}
+
+	header {
+		Strict-Transport-Security "max-age=31536000"
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "DENY"
+		Referrer-Policy "no-referrer"
+		-Server
+	}
+
+	reverse_proxy api:8000
+
+	log {
+		output stdout
+		format json
+	}
+}

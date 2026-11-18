@@ -15,6 +15,8 @@ from pydantic import ValidationError
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from docflow.backup import backup_database, restore_database
+from docflow.config import get_settings
 from docflow.db import get_engine
 from docflow.models import Role, User
 from docflow.schemas import UserCreate
@@ -62,18 +64,43 @@ def init_storage() -> None:
     print("Created bucket" if storage.ensure_bucket() else "Bucket already exists")
 
 
+def backup() -> None:
+    key = backup_database(get_settings().database_url, get_s3_storage())
+    print(f"Backup written to {key}")
+
+
+def restore(key: str, target_url: str) -> None:
+    """Restore into an explicitly named database. Refuses the application's own database unless
+    --i-mean-production is given, so a restore test cannot overwrite live data by accident."""
+    restore_database(target_url, get_s3_storage(), key)
+    print(f"Restored {key}")
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(prog="docflow.cli")
     commands = parser.add_subparsers(dest="command", required=True)
     admin = commands.add_parser("create-admin", help="Create the first admin user")
     admin.add_argument("--email", required=True)
     commands.add_parser("init-storage", help="Create the document bucket if missing")
+    commands.add_parser("backup", help="Dump the database to object storage")
+    restore_cmd = commands.add_parser("restore", help="Restore a backup into a database")
+    restore_cmd.add_argument("--key", required=True, help="Storage key of the backup")
+    restore_cmd.add_argument("--database-url", required=True, help="Target database (must exist)")
+    restore_cmd.add_argument("--i-mean-production", action="store_true")
     args = parser.parse_args()
 
     if args.command == "create-admin":
         create_admin(args.email)
     elif args.command == "init-storage":
         init_storage()
+    elif args.command == "backup":
+        backup()
+    elif args.command == "restore":
+        target = args.database_url.replace("postgresql+psycopg://", "postgresql://")
+        live = get_settings().database_url.replace("postgresql+psycopg://", "postgresql://")
+        if target == live and not args.i_mean_production:
+            sys.exit("Refusing to restore over the live database (add --i-mean-production)")
+        restore(args.key, args.database_url)
 
 
 if __name__ == "__main__":

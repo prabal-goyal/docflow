@@ -70,3 +70,18 @@ def make_pdf(pages: int = 1, password: str | None = None) -> bytes:
     buffer = BytesIO()
     writer.write(buffer)
     return buffer.getvalue()
+
+
+class InMemoryLoginLimiter:
+    def __init__(self, max_failures: int = 10) -> None:
+        self.max_failures = max_failures
+        self.failures: dict[tuple[str, str], int] = {}
+
+    def retry_after(self, email: str, ip: str) -> int | None:
+        return 900 if self.failures.get((email, ip), 0) >= self.max_failures else None
+
+    def record_failure(self, email: str, ip: str) -> None:
+        self.failures[(email, ip)] = self.failures.get((email, ip), 0) + 1
+
+    def reset(self, email: str, ip: str) -> None:
+        self.failures.pop((email, ip), None)

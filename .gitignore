@@ -8,3 +8,9 @@ __pycache__/
 *.egg-info/
 dist/
 .venv-linux/
+
+# Terraform: local state and provider cache (the lock file IS committed)
+infra/.terraform/
+infra/*.tfstate
+infra/*.tfstate.*
+infra/*.tfplan

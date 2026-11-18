@@ -2,7 +2,7 @@ from decimal import Decimal
 from functools import lru_cache
 from typing import Literal
 
-from pydantic import Field, SecretStr, field_validator
+from pydantic import Field, SecretStr, field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from docflow.roles import Role
@@ -21,6 +21,7 @@ class Settings(BaseSettings):
     app_name: str = "DocFlow"
     environment: str = "local"
     version: str = "0.1.0"
+    log_level: str = "INFO"
 
     database_url: str
     jwt_secret: SecretStr = Field(min_length=MIN_JWT_SECRET_LENGTH)
@@ -47,6 +48,8 @@ class Settings(BaseSettings):
     # this in production; it disables the SSRF protection.
     webhook_allow_private_targets: bool = False
     webhook_timeout_seconds: float = Field(default=10, gt=0)
+    # KMS key (id, ARN or alias) that encrypts webhook signing secrets. Required in production.
+    webhook_secret_kms_key_id: str | None = None
 
     # Read from the standard OPENAI_API_KEY variable (no DOCFLOW_ prefix). Only the worker needs it.
     openai_api_key: SecretStr | None = Field(default=None, validation_alias="OPENAI_API_KEY")
@@ -62,6 +65,16 @@ class Settings(BaseSettings):
         "gpt-6.1-sol": (Decimal("2.00"), Decimal("10.00")),
         "gpt-6-astra": (Decimal("10.00"), Decimal("50.00")),
     }
+
+    @model_validator(mode="after")
+    def production_is_locked_down(self) -> "Settings":
+        # Fail at startup rather than run production with development shortcuts.
+        if self.environment == "production":
+            if not self.webhook_secret_kms_key_id:
+                raise ValueError("production requires DOCFLOW_WEBHOOK_SECRET_KMS_KEY_ID")
+            if self.webhook_allow_private_targets:
+                raise ValueError("webhook_allow_private_targets must be false in production")
+        return self
 
     @field_validator("approval_stages")
     @classmethod
