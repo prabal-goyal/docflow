@@ -7,7 +7,7 @@ set -euo pipefail
 
 BASE_URL="${BASE_URL:-http://localhost:8000}"
 EXPECTED_STATUS="${1:-extraction_failed}"
-EXPECTED_REASON="${2:-No extraction provider is configured}"
+EXPECTED_REASON="${2:-OPENAI_API_KEY is not set}"
 ADMIN_EMAIL="smoke-admin@example.com"
 ADMIN_PASSWORD="smoke-admin-password-1"
 SUBMITTER_EMAIL="smoke-submitter@example.com"

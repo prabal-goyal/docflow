@@ -1,0 +1,36 @@
+{
+  "fields": {
+    "invoice_number": "NS-55021",
+    "invoice_date": "2026-10-03",
+    "supplier_name": "Northsea Valve Co. Ltd",
+    "supplier_country": "United Kingdom",
+    "buyer_name": "Gulf Drilling Services LLP",
+    "buyer_country": "India",
+    "currency": "GBP",
+    "line_items": [
+      {
+        "description": "Gate valve, 4 in, API 6A",
+        "hs_code": "84818081",
+        "quantity": "3",
+        "unit_price": "2140.00",
+        "amount": "6420.00"
+      },
+      {
+        "description": "Valve stem packing set",
+        "hs_code": "84849000",
+        "quantity": "5",
+        "unit_price": "96.40",
+        "amount": "528.00"
+      }
+    ],
+    "subtotal": "6948.00",
+    "tax_total": "0.00",
+    "total": "6948.00"
+  },
+  "expected_flags": [
+    {
+      "field": "line_items[1].amount",
+      "code": "arithmetic_mismatch"
+    }
+  ]
+}

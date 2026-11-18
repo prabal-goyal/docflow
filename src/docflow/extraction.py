@@ -1,9 +1,26 @@
 from dataclasses import dataclass
-from typing import Any, Protocol
+from typing import Protocol
+
+from docflow.invoice import InvoiceExtraction
+
+
+@dataclass(frozen=True)
+class Usage:
+    """What one provider call cost us, recorded even when the call did not succeed."""
+
+    model: str
+    input_tokens: int | None = None
+    output_tokens: int | None = None  # includes reasoning tokens
+    reasoning_tokens: int | None = None
+    response_id: str | None = None
 
 
 class PermanentExtractionError(Exception):
     """Extraction failed and retrying will not help (bad input, refusal, misconfiguration)."""
+
+    def __init__(self, message: str, usage: Usage | None = None) -> None:
+        super().__init__(message)
+        self.usage = usage
 
 
 class RetryableExtractionError(Exception):
@@ -12,13 +29,9 @@ class RetryableExtractionError(Exception):
 
 @dataclass(frozen=True)
 class ExtractionResult:
-    fields: dict[str, Any]
+    invoice: InvoiceExtraction
+    usage: Usage | None = None
 
 
 class Extractor(Protocol):
     def extract(self, pdf: bytes) -> ExtractionResult: ...
-
-
-def get_extractor() -> Extractor:
-    """Builds the configured extractor. The OpenAI extractor arrives in M2b."""
-    raise PermanentExtractionError("No extraction provider is configured")

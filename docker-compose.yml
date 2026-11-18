@@ -9,6 +9,8 @@ x-app-env: &app-env
   # Local-only credentials for the S3-compatible server; on AWS the IAM role is used instead.
   AWS_ACCESS_KEY_ID: docflow-local
   AWS_SECRET_ACCESS_KEY: docflow-local-secret
+  # Empty when unset (as in CI): extraction then fails with a clear reason instead of calling OpenAI.
+  OPENAI_API_KEY: ${OPENAI_API_KEY:-}
 
 services:
   db:

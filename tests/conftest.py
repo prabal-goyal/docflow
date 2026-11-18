@@ -20,6 +20,8 @@ TEST_JWT_SECRET = "test-only-secret-that-is-long-enough-1234567890"
 # Forced (not setdefault) so tests can never point at a real database or reuse a real secret.
 os.environ["DOCFLOW_DATABASE_URL"] = TEST_DATABASE_URL
 os.environ["DOCFLOW_JWT_SECRET"] = TEST_JWT_SECRET
+# Overrides any real key in .env, so no test can ever call the paid API.
+os.environ["OPENAI_API_KEY"] = ""
 
 from docflow.db import get_db  # noqa: E402  (must import after the environment is set)
 from docflow.jobs import get_enqueue  # noqa: E402

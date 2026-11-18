@@ -1,5 +1,6 @@
 import uuid
 from datetime import datetime
+from decimal import Decimal
 from enum import StrEnum
 from typing import Any
 
@@ -10,6 +11,7 @@ from sqlalchemy import (
     ForeignKey,
     Integer,
     MetaData,
+    Numeric,
     String,
     Text,
     UniqueConstraint,
@@ -90,6 +92,7 @@ class Submission(Base):
     )
     stage: Mapped[int | None] = mapped_column(Integer)
     fields: Mapped[dict[str, Any] | None] = mapped_column(JSONB)
+    flags: Mapped[list[dict[str, str]] | None] = mapped_column(JSONB)
     idempotency_key: Mapped[str | None] = mapped_column(String(255))
     failure_reason: Mapped[str | None] = mapped_column(Text)
     # When a worker claimed this submission for extraction. The claim is a lease: if the worker
@@ -115,3 +118,32 @@ class Document(Base):
     created_at: Mapped[datetime] = created_at_column()
 
     submission: Mapped[Submission] = relationship(back_populates="document")
+
+
+class AttemptOutcome(StrEnum):
+    SUCCEEDED = "succeeded"
+    FAILED = "failed"
+
+
+class ExtractionAttempt(Base):
+    """One call to the LLM provider, kept even when it failed: failed calls can still cost money,
+    and this table is the audit trail for cost, latency and model choice."""
+
+    __tablename__ = "extraction_attempts"
+
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
+    submission_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("submissions.id", ondelete="CASCADE"), index=True
+    )
+    provider: Mapped[str] = mapped_column(String(50))
+    model: Mapped[str] = mapped_column(String(100))
+    reasoning_effort: Mapped[str] = mapped_column(String(20))
+    outcome: Mapped[AttemptOutcome] = mapped_column(pg_enum(AttemptOutcome, "attempt_outcome"))
+    input_tokens: Mapped[int | None] = mapped_column(Integer)
+    output_tokens: Mapped[int | None] = mapped_column(Integer)
+    reasoning_tokens: Mapped[int | None] = mapped_column(Integer)
+    estimated_cost_usd: Mapped[Decimal | None] = mapped_column(Numeric(12, 6))
+    latency_ms: Mapped[int] = mapped_column(Integer)
+    response_id: Mapped[str | None] = mapped_column(String(255))
+    error: Mapped[str | None] = mapped_column(Text)
+    created_at: Mapped[datetime] = created_at_column()

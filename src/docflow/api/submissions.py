@@ -9,9 +9,9 @@ from sqlalchemy.exc import IntegrityError
 
 from docflow.deps import AppSettings, CurrentUser, DbSession, require_roles
 from docflow.jobs import EnqueueExtraction, get_enqueue
-from docflow.models import Document, Role, Submission, User
+from docflow.models import Document, ExtractionAttempt, Role, Submission, User
 from docflow.pdf import looks_like_pdf
-from docflow.schemas import SubmissionOut
+from docflow.schemas import ExtractionAttemptOut, SubmissionOut
 from docflow.storage import ObjectStorage, StorageError, get_storage
 
 router = APIRouter(prefix="/submissions", tags=["submissions"])
@@ -133,3 +133,20 @@ def get_submission(submission_id: uuid.UUID, db: DbSession, user: CurrentUser) -
     if submission is None or (user.role == Role.SUBMITTER and submission.submitter_id != user.id):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Submission not found")
     return SubmissionOut.model_validate(submission)
+
+
+@router.get("/{submission_id}/attempts")
+def list_extraction_attempts(
+    submission_id: uuid.UUID,
+    db: DbSession,
+    _admin: Annotated[User, Depends(require_roles(Role.ADMIN))],
+) -> list[ExtractionAttemptOut]:
+    """Admin audit trail: every LLM call for this submission with tokens, cost and latency."""
+    if db.get(Submission, submission_id) is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Submission not found")
+    attempts = db.scalars(
+        select(ExtractionAttempt)
+        .where(ExtractionAttempt.submission_id == submission_id)
+        .order_by(ExtractionAttempt.created_at, ExtractionAttempt.id)
+    )
+    return [ExtractionAttemptOut.model_validate(a) for a in attempts]

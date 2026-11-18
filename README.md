@@ -4,7 +4,7 @@ AI document intake and approval API. Upload a commercial invoice; an LLM extract
 deterministic checks flag anything suspicious, reviewers approve in stages with field-level queries,
 and the customer's system is notified through signed webhooks.
 
-Status: **M2a (upload, storage, background worker)** done; OpenAI extraction (M2b) next. See [docs/PLAN.md](docs/PLAN.md) for the full plan.
+Status: **M2 (upload and AI extraction)** done; review workflow (M3) next. See [docs/PLAN.md](docs/PLAN.md) for the full plan.
 
 ## Run with Docker
 
@@ -27,7 +27,11 @@ docker compose up --build
 
 The API and worker start only after `migrate` succeeds.
 
-`scripts/smoke_test.sh` runs an end-to-end check against a fresh stack (CI runs it too).
+The worker reads `OPENAI_API_KEY` from `.env`. Without it, extraction fails with a clear reason.
+
+`scripts/smoke_test.sh` runs an end-to-end check against a fresh stack (CI runs it too). It expects
+no API key, so start the stack with `OPENAI_API_KEY= docker compose up -d --build` when running it
+locally.
 
 Create the first admin (prompts for a password):
 
@@ -42,9 +46,11 @@ username.
 
 Python tooling runs in Linux (WSL on Windows). Native Windows is not supported: Windows
 Application Control blocks the compiled extensions that SQLAlchemy and other libraries ship.
+On WSL, keep the virtualenv on the Linux filesystem: reading thousands of package files through
+`/mnt/<drive>` is slow enough to stall mypy.
 
 ```bash
-export UV_PROJECT_ENVIRONMENT=.venv-linux   # keeps the Linux venv separate from any Windows one
+export UV_PROJECT_ENVIRONMENT=$HOME/.venvs/docflow
 docker compose up -d db redis storage       # Postgres (incl. docflow_test), Redis, object storage
 uv sync
 uv run alembic upgrade head
@@ -86,6 +92,35 @@ for what is production-grade and what is deliberately left out.
   `Idempotency-Key` header makes retries safe.
 - `GET /submissions/{id}`: submitters see their own; reviewers, approvers and admins see all.
 
+- `GET /submissions/{id}/attempts` (admin): every LLM call with tokens, estimated cost and latency.
+
 Lifecycle so far: `uploaded -> extracting -> in_review (stage 1)` or `extraction_failed` with a
 `failure_reason`. See [docs/decisions/0002-background-extraction.md](docs/decisions/0002-background-extraction.md)
 for how duplicate deliveries, crashed workers and retries are handled.
+
+## AI extraction
+
+The worker sends the PDF to OpenAI (`gpt-6-luna` by default, `DOCFLOW_LLM_MODEL`) and gets back an
+`InvoiceExtraction`: every field has a normalised `value` and the exact `source_quote` it came
+from. Deterministic checks then add `flags` for a reviewer:
+
+| Code | Meaning |
+|---|---|
+| `not_grounded` | The quoted text is not in the PDF, so the value may be invented |
+| `grounding_unverifiable` | Scanned PDF without a text layer |
+| `arithmetic_mismatch` | Line amount, subtotal or total does not add up |
+| `invalid_format` | HS code, currency or date is invalid |
+| `unparseable_number` | An amount is not a number |
+| `missing_required` | A required field is missing |
+
+See [docs/decisions/0003-llm-extraction.md](docs/decisions/0003-llm-extraction.md).
+
+### Sample invoices and live test
+
+`samples/` holds three synthetic invoices with their expected values and flags
+(`uv run python scripts/make_sample_invoices.py` regenerates them). With a real key in `.env` and
+a stack on which `scripts/smoke_test.sh` has run:
+
+```bash
+uv run python scripts/live_test.py   # calls OpenAI: costs real money (fractions of a cent per invoice on gpt-6-luna)
+```

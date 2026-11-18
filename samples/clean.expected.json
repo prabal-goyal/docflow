@@ -1,0 +1,38 @@
+{
+  "fields": {
+    "invoice_number": "AT-2026-1187",
+    "invoice_date": "2026-10-14",
+    "supplier_name": "Acme Bohrtechnik GmbH",
+    "supplier_country": "Germany",
+    "buyer_name": "Gulf Drilling Services LLP",
+    "buyer_country": "India",
+    "currency": "EUR",
+    "line_items": [
+      {
+        "description": "Tungsten carbide drill bit, 8.5 in",
+        "hs_code": "82071910",
+        "quantity": "6",
+        "unit_price": "1250.00",
+        "amount": "7500.00"
+      },
+      {
+        "description": "Mud pump piston seal kit",
+        "hs_code": "84842000",
+        "quantity": "12",
+        "unit_price": "310.50",
+        "amount": "3726.00"
+      },
+      {
+        "description": "Drill pipe thread protector",
+        "hs_code": "73269099",
+        "quantity": "40",
+        "unit_price": "18.75",
+        "amount": "750.00"
+      }
+    ],
+    "subtotal": "11976.00",
+    "tax_total": "598.80",
+    "total": "12574.80"
+  },
+  "expected_flags": []
+}

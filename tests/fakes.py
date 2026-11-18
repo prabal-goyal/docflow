@@ -2,12 +2,13 @@
 
 import uuid
 from io import BytesIO
-from typing import Any
 
 from pypdf import PdfWriter
 
-from docflow.extraction import ExtractionResult
+from docflow.extraction import ExtractionResult, Usage
+from docflow.invoice import InvoiceExtraction
 from docflow.storage import StorageError
+from tests.invoices import make_invoice
 
 LETTER = (612, 792)
 
@@ -41,17 +42,23 @@ class RecordingQueue:
 
 class FakeExtractor:
     def __init__(
-        self, fields: dict[str, Any] | None = None, error: Exception | None = None
+        self,
+        invoice: InvoiceExtraction | None = None,
+        error: Exception | None = None,
+        usage: Usage | None = None,
     ) -> None:
-        self.fields = fields if fields is not None else {"invoice_number": {"value": "INV-1"}}
+        self.invoice = invoice if invoice is not None else make_invoice()
         self.error = error
+        self.usage = usage or Usage(
+            model="gpt-6-luna", input_tokens=4000, output_tokens=1000, reasoning_tokens=600
+        )
         self.calls = 0
 
     def extract(self, pdf: bytes) -> ExtractionResult:
         self.calls += 1
         if self.error is not None:
             raise self.error
-        return ExtractionResult(fields=self.fields)
+        return ExtractionResult(invoice=self.invoice, usage=self.usage)
 
 
 def make_pdf(pages: int = 1, password: str | None = None) -> bytes:

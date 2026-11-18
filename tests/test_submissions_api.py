@@ -1,6 +1,6 @@
 import uuid
 
-import httpx
+import httpx2
 import pytest
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
@@ -16,10 +16,10 @@ def upload(
     headers: dict[str, str],
     data: bytes,
     idempotency_key: str | None = None,
-) -> httpx.Response:
+) -> httpx2.Response:
     if idempotency_key is not None:
         headers = {**headers, "Idempotency-Key": idempotency_key}
-    response: httpx.Response = client.post(
+    response: httpx2.Response = client.post(
         "/submissions",
         files={"file": ("invoice.pdf", data, "application/pdf")},
         headers=headers,

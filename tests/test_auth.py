@@ -1,6 +1,6 @@
 from datetime import timedelta
 
-import httpx
+import httpx2
 from fastapi.testclient import TestClient
 
 from docflow.config import get_settings
@@ -11,8 +11,8 @@ from tests.conftest import DEFAULT_PASSWORD, LoginAs, MakeUser
 NEW_PASSWORD = "a-brand-new-password-42"
 
 
-def login(client: TestClient, email: str, password: str = DEFAULT_PASSWORD) -> httpx.Response:
-    response: httpx.Response = client.post(
+def login(client: TestClient, email: str, password: str = DEFAULT_PASSWORD) -> httpx2.Response:
+    response: httpx2.Response = client.post(
         "/auth/login", data={"username": email, "password": password}
     )
     return response

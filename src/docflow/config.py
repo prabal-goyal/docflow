@@ -1,4 +1,6 @@
+from decimal import Decimal
 from functools import lru_cache
+from typing import Literal
 
 from pydantic import Field, SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -32,6 +34,21 @@ class Settings(BaseSettings):
 
     max_upload_bytes: int = Field(default=10 * 1024 * 1024, gt=0)
     max_pdf_pages: int = Field(default=20, gt=0)
+
+    # Read from the standard OPENAI_API_KEY variable (no DOCFLOW_ prefix). Only the worker needs it.
+    openai_api_key: SecretStr | None = Field(default=None, validation_alias="OPENAI_API_KEY")
+    llm_model: str = "gpt-6-luna"
+    llm_reasoning_effort: Literal["none", "low", "medium", "high"] = "medium"
+    llm_timeout_seconds: float = Field(default=120, gt=0)
+    llm_max_output_tokens: int = Field(default=25_000, gt=0)
+    # USD per 1M tokens (input, output), from OpenAI's pricing page on 2026-11-17. Used only for
+    # cost estimates; a model missing here is logged with no cost rather than a wrong one.
+    llm_prices_per_million: dict[str, tuple[Decimal, Decimal]] = {
+        "gpt-6-luna": (Decimal("0.10"), Decimal("0.50")),
+        "gpt-6.1-terra": (Decimal("1.00"), Decimal("5.00")),
+        "gpt-6.1-sol": (Decimal("2.00"), Decimal("10.00")),
+        "gpt-6-astra": (Decimal("10.00"), Decimal("50.00")),
+    }
 
 
 @lru_cache

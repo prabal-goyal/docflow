@@ -2,23 +2,33 @@
 message broker; the Celery task in worker.py is a thin wrapper around process_submission."""
 
 import logging
+import time
 import uuid
 from collections.abc import Callable
-from datetime import timedelta
+from datetime import UTC, datetime, timedelta
+from decimal import Decimal
 from enum import Enum, auto
 
 from sqlalchemy import func, or_, select, update
 from sqlalchemy.orm import Session
 
-from docflow.extraction import Extractor, PermanentExtractionError, RetryableExtractionError
+from docflow.checks import run_checks
+from docflow.config import Settings
+from docflow.extraction import (
+    Extractor,
+    PermanentExtractionError,
+    RetryableExtractionError,
+    Usage,
+)
 from docflow.jobs import TASK_TIME_LIMIT_SECONDS
-from docflow.models import Submission, SubmissionStatus
+from docflow.models import AttemptOutcome, ExtractionAttempt, Submission, SubmissionStatus
 from docflow.pdf import InvalidPdfError, inspect_pdf
 from docflow.storage import ObjectStorage, StorageError
 
 logger = logging.getLogger(__name__)
 
 FIRST_REVIEW_STAGE = 1
+TOKENS_PER_MILLION = Decimal(1_000_000)
 
 # A claim older than the longest a task can run means the worker holding it is gone.
 CLAIM_LEASE = timedelta(seconds=TASK_TIME_LIMIT_SECONDS + 60)
@@ -58,12 +68,48 @@ def claim(db: Session, submission_id: uuid.UUID) -> Claim:
     return Claim.BUSY if current == SubmissionStatus.EXTRACTING else Claim.NOTHING_TO_DO
 
 
+def estimate_cost(usage: Usage, settings: Settings) -> Decimal | None:
+    prices = settings.llm_prices_per_million.get(usage.model)
+    if prices is None or usage.input_tokens is None or usage.output_tokens is None:
+        return None
+    input_price, output_price = prices
+    return (
+        usage.input_tokens * input_price + usage.output_tokens * output_price
+    ) / TOKENS_PER_MILLION
+
+
+def record_attempt(
+    db: Session,
+    submission_id: uuid.UUID,
+    settings: Settings,
+    started: float,
+    usage: Usage | None,
+    error: str | None,
+) -> None:
+    db.add(
+        ExtractionAttempt(
+            submission_id=submission_id,
+            provider="openai",
+            model=usage.model if usage else settings.llm_model,
+            reasoning_effort=settings.llm_reasoning_effort,
+            outcome=AttemptOutcome.FAILED if error else AttemptOutcome.SUCCEEDED,
+            input_tokens=usage.input_tokens if usage else None,
+            output_tokens=usage.output_tokens if usage else None,
+            reasoning_tokens=usage.reasoning_tokens if usage else None,
+            estimated_cost_usd=estimate_cost(usage, settings) if usage else None,
+            latency_ms=round((time.monotonic() - started) * 1000),
+            response_id=usage.response_id if usage else None,
+            error=error,
+        )
+    )
+
+
 def process_submission(
     submission_id: uuid.UUID,
     db: Session,
     storage: ObjectStorage,
     get_extractor: Callable[[], Extractor],
-    max_pages: int,
+    settings: Settings,
 ) -> None:
     """Ends in IN_REVIEW or EXTRACTION_FAILED, except for transient failures: those raise
     StorageError or RetryableExtractionError after releasing the claim, and ClaimBusyError
@@ -80,27 +126,49 @@ def process_submission(
     submission = db.scalars(select(Submission).where(Submission.id == submission_id)).one()
     try:
         pdf = storage.get(submission.document.storage_key)
-        submission.document.page_count = inspect_pdf(pdf, max_pages).page_count
-        result = get_extractor().extract(pdf)
+        info = inspect_pdf(pdf, settings.max_pdf_pages)
+        submission.document.page_count = info.page_count
+        extractor = get_extractor()
     except (InvalidPdfError, PermanentExtractionError) as error:
-        logger.warning("Extraction failed for submission %s: %s", submission_id, error)
-        submission.status = SubmissionStatus.EXTRACTION_FAILED
-        submission.failure_reason = str(error)
-        submission.claimed_at = None
-        db.commit()
+        fail(db, submission, str(error))
         return
-    except (StorageError, RetryableExtractionError):
+    except StorageError:
         db.rollback()
         release(db, submission_id)
         raise
 
-    submission.fields = result.fields
+    started = time.monotonic()
+    try:
+        result = extractor.extract(pdf)
+    except PermanentExtractionError as error:
+        record_attempt(db, submission_id, settings, started, error.usage, str(error))
+        fail(db, submission, str(error))
+        return
+    except RetryableExtractionError as error:
+        db.rollback()
+        record_attempt(db, submission_id, settings, started, None, str(error))
+        db.commit()
+        release(db, submission_id)
+        raise
+
+    record_attempt(db, submission_id, settings, started, result.usage, None)
+    flags = run_checks(result.invoice, info.text, today=datetime.now(UTC).date())
+    submission.fields = result.invoice.model_dump(mode="json")
+    submission.flags = [flag.to_dict() for flag in flags]
     submission.status = SubmissionStatus.IN_REVIEW
     submission.stage = FIRST_REVIEW_STAGE
     submission.failure_reason = None
     submission.claimed_at = None
     db.commit()
-    logger.info("Submission %s extracted and ready for review", submission_id)
+    logger.info("Submission %s extracted with %d flag(s)", submission_id, len(flags))
+
+
+def fail(db: Session, submission: Submission, reason: str) -> None:
+    logger.warning("Extraction failed for submission %s: %s", submission.id, reason)
+    submission.status = SubmissionStatus.EXTRACTION_FAILED
+    submission.failure_reason = reason
+    submission.claimed_at = None
+    db.commit()
 
 
 def release(db: Session, submission_id: uuid.UUID) -> None:

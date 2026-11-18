@@ -8,8 +8,9 @@ from sqlalchemy.orm import Session
 
 from docflow.config import get_settings
 from docflow.db import get_engine
-from docflow.extraction import RetryableExtractionError, get_extractor
+from docflow.extraction import RetryableExtractionError
 from docflow.jobs import EXTRACT_TASK, get_celery
+from docflow.openai_extractor import get_extractor
 from docflow.pipeline import CLAIM_LEASE, ClaimBusyError, give_up, process_submission
 from docflow.storage import StorageError, get_s3_storage
 
@@ -26,9 +27,7 @@ def extract_submission(self: Task, submission_id: str) -> None:
     sid = uuid.UUID(submission_id)
     with Session(get_engine()) as db:
         try:
-            process_submission(
-                sid, db, get_s3_storage(), get_extractor, get_settings().max_pdf_pages
-            )
+            process_submission(sid, db, get_s3_storage(), get_extractor, get_settings())
         except ClaimBusyError as error:
             # Another worker holds the claim. Look again once its lease would have expired;
             # if that worker died, this delivery takes over.

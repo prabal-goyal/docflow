@@ -1,0 +1,40 @@
+{
+  "fields": {
+    "invoice_number": "KX/2026/0098",
+    "invoice_date": "2026-09-21",
+    "supplier_name": "Kaveri Hydraulics Pvt Ltd",
+    "supplier_country": "India",
+    "buyer_name": null,
+    "buyer_country": null,
+    "currency": "USD",
+    "line_items": [
+      {
+        "description": "Hydraulic hose assembly, 2 in",
+        "hs_code": "400942",
+        "quantity": "10",
+        "unit_price": "145.00",
+        "amount": "1450.00"
+      },
+      {
+        "description": "Pressure gauge, 10k psi",
+        "hs_code": "9026B",
+        "quantity": "4",
+        "unit_price": "88.25",
+        "amount": "353.00"
+      }
+    ],
+    "subtotal": "1803.00",
+    "tax_total": "0.00",
+    "total": "1803.00"
+  },
+  "expected_flags": [
+    {
+      "field": "buyer_name",
+      "code": "missing_required"
+    },
+    {
+      "field": "line_items[1].hs_code",
+      "code": "invalid_format"
+    }
+  ]
+}
