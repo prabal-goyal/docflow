@@ -16,10 +16,15 @@ variable "environment" {
   default     = "prod"
 }
 
-variable "github_repository" {
-  description = "owner/name of the GitHub repository allowed to deploy (from its main branch only)."
+variable "github_oidc_subject_prefix" {
+  description = <<-EOT
+    Start of the OIDC subject GitHub issues for the deploying repository. Repositories using
+    GitHub's immutable subjects include the owner and repository ids, so a deleted-and-recreated
+    repository with the same name cannot deploy. Look it up with:
+      gh api repos/OWNER/REPO/actions/oidc/customization/sub   (field sub_claim_prefix)
+  EOT
   type        = string
-  default     = "prabal-goyal/docflow"
+  default     = "repo:prabal-goyal@89393467/docflow@1461059601"
 }
 
 variable "instance_type" {

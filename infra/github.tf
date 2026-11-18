@@ -1,5 +1,7 @@
 # GitHub Actions deploys with short-lived credentials from OIDC: no AWS keys are stored in GitHub.
-# The role can only be assumed by workflows on the main branch of this one repository.
+# The deploy job runs in the GitHub environment "production", so its token's subject is
+# <subject prefix>:environment:production (not the branch). That environment only allows the
+# main branch (deployment branch policy, set in GitHub), so only main of this repository can deploy.
 
 resource "aws_iam_openid_connect_provider" "github" {
   url            = "https://token.actions.githubusercontent.com"
@@ -21,7 +23,7 @@ data "aws_iam_policy_document" "github_assume" {
     condition {
       test     = "StringEquals"
       variable = "token.actions.githubusercontent.com:sub"
-      values   = ["repo:${var.github_repository}:ref:refs/heads/main"]
+      values   = ["${var.github_oidc_subject_prefix}:environment:production"]
     }
   }
 }
