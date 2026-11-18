@@ -4,7 +4,8 @@ must not make DocFlow call into its own network (databases, the cloud metadata s
 import ipaddress
 import socket
 from collections.abc import Callable
-from urllib.parse import urlsplit
+from dataclasses import dataclass
+from urllib.parse import urlsplit, urlunsplit
 
 Resolver = Callable[[str], list[str]]
 
@@ -31,9 +32,10 @@ def is_public(address: str) -> bool:
     return ip.is_global and not ip.is_multicast
 
 
-def validate_target(url: str, allow_private: bool, resolve: Resolver = resolve_host) -> None:
+def validate_target(url: str, allow_private: bool, resolve: Resolver = resolve_host) -> list[str]:
     """Raises UnsafeUrlError unless the URL is HTTPS and every address of its host is public.
-    allow_private is for local development only (a mock receiver inside Docker)."""
+    Returns the vetted addresses (empty when allow_private skips the check: local development
+    only, for a mock receiver inside Docker)."""
     parts = urlsplit(url)
     if parts.scheme != "https" and not (allow_private and parts.scheme == "http"):
         raise UnsafeUrlError("Webhook URLs must use https")
@@ -42,10 +44,40 @@ def validate_target(url: str, allow_private: bool, resolve: Resolver = resolve_h
     if parts.username or parts.password:
         raise UnsafeUrlError("Webhook URLs must not contain credentials")
     if allow_private:
-        return
+        return []
     addresses = resolve(parts.hostname)
     if not addresses:
         raise UnsafeUrlError(f"Host {parts.hostname!r} has no addresses")
     blocked = [address for address in addresses if not is_public(address)]
     if blocked:
         raise UnsafeUrlError(f"Host {parts.hostname!r} resolves to a non-public address")
+    return addresses
+
+
+@dataclass(frozen=True)
+class PinnedTarget:
+    """Where to connect, and the name to present for HTTP (Host) and TLS (SNI and certificate)."""
+
+    url: str
+    host_header: str | None = None
+    sni_hostname: str | None = None
+
+
+def pin_to_vetted_address(url: str, addresses: list[str]) -> PinnedTarget:
+    """Connect to an address the SSRF check approved instead of letting the HTTP client resolve
+    the name again. That closes the DNS-rebinding window (a second lookup could return an internal
+    address), and choosing IPv4 suits a server whose Docker network has no IPv6. The certificate
+    is still verified against the hostname, through SNI."""
+    if not addresses:
+        return PinnedTarget(url)  # local development: no check was made, nothing to pin
+    ipv4 = [a for a in addresses if ipaddress.ip_address(a).version == 4]
+    if not ipv4:
+        raise UnsafeUrlError("The webhook host has no IPv4 address, which this server needs")
+    parts = urlsplit(url)
+    hostname = parts.hostname or ""
+    port = f":{parts.port}" if parts.port else ""
+    return PinnedTarget(
+        url=urlunsplit(parts._replace(netloc=f"{ipv4[0]}{port}")),
+        host_header=f"{hostname}{port}",
+        sni_hostname=hostname,
+    )

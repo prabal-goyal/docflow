@@ -19,7 +19,13 @@ from sqlalchemy.orm import Session
 from docflow.config import Settings
 from docflow.models import DeliveryStatus, WebhookDelivery
 from docflow.secret_cipher import SecretCipher, SecretDecryptionError
-from docflow.ssrf import Resolver, UnsafeUrlError, resolve_host, validate_target
+from docflow.ssrf import (
+    Resolver,
+    UnsafeUrlError,
+    pin_to_vetted_address,
+    resolve_host,
+    validate_target,
+)
 from docflow.webhooks import canonical_body, sign
 
 logger = logging.getLogger(__name__)
@@ -36,13 +42,6 @@ MAX_ATTEMPTS = len(RETRY_DELAYS) + 1
 CLAIM_LEASE = timedelta(seconds=60)
 BATCH_SIZE = 20
 MAX_ERROR_CHARS = 500
-
-
-def outbound_http_client() -> httpx2.Client:
-    """HTTP client for webhook deliveries, bound to IPv4. The server's Docker network has no IPv6,
-    and without this a receiver that also has an IPv6 address fails with "Cannot assign requested
-    address" (found in production with webhook.site)."""
-    return httpx2.Client(transport=httpx2.HTTPTransport(local_address="0.0.0.0"))
 
 
 def claim_due(db: Session, limit: int = BATCH_SIZE) -> list[uuid.UUID]:
@@ -88,7 +87,8 @@ def deliver(
         return finish(db, delivery, DeliveryStatus.FAILED, None, "Endpoint is deactivated")
     try:
         # Checked again on every send: DNS can change after the endpoint was registered.
-        validate_target(endpoint.url, settings.webhook_allow_private_targets, resolve)
+        addresses = validate_target(endpoint.url, settings.webhook_allow_private_targets, resolve)
+        target = pin_to_vetted_address(endpoint.url, addresses)
     except UnsafeUrlError as error:
         return finish(db, delivery, DeliveryStatus.FAILED, None, f"Unsafe target: {error}")
 
@@ -111,13 +111,16 @@ def deliver(
         "DocFlow-Timestamp": str(timestamp),
         "DocFlow-Signature": sign(secret, timestamp, body),
     }
+    if target.host_header:
+        headers["Host"] = target.host_header
     try:
         response = client.post(
-            endpoint.url,
+            target.url,
             content=body,
             headers=headers,
             timeout=settings.webhook_timeout_seconds,
             follow_redirects=False,
+            extensions={"sni_hostname": target.sni_hostname} if target.sni_hostname else None,
         )
     except httpx2.HTTPError as error:
         return retry_or_fail(db, delivery, None, f"{type(error).__name__}: {error}", now)

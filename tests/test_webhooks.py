@@ -445,3 +445,42 @@ def test_stored_secret_is_not_the_one_returned(
     assert stored is not None
     assert stored.secret != created["secret"]  # encrypted at rest (dev mode: "plain:" prefix)
     assert stored.secret.endswith(created["secret"])
+
+
+def test_delivery_connects_to_the_vetted_ipv4_address_with_the_real_hostname(db: Session) -> None:
+    """Closes DNS rebinding (no second lookup) and works on an IPv4-only network, while TLS still
+    checks the certificate against the hostname through SNI."""
+    queued(db, make_endpoint(db))
+    receiver = FakeReceiver()
+
+    dispatch_due(
+        lambda: nullcontext(db),
+        receiver.client(),
+        SETTINGS,
+        PlainCipher(),
+        lambda host: ["2606:4700::6810:84e5", PUBLIC_IP],  # IPv6 first, as real DNS often returns
+    )
+
+    [request] = receiver.requests
+    assert request.url.host == PUBLIC_IP
+    assert request.url.path == "/docflow"
+    assert request.headers["Host"] == "hooks.customer.example"
+    assert request.extensions["sni_hostname"] == "hooks.customer.example"
+
+
+def test_host_with_only_ipv6_addresses_fails_clearly(db: Session) -> None:
+    delivery = queued(db, make_endpoint(db))
+    receiver = FakeReceiver()
+
+    dispatch_due(
+        lambda: nullcontext(db),
+        receiver.client(),
+        SETTINGS,
+        PlainCipher(),
+        lambda host: ["2606:4700::1"],
+    )
+
+    db.refresh(delivery)
+    assert delivery.status == DeliveryStatus.FAILED
+    assert "no IPv4 address" in (delivery.last_error or "")
+    assert receiver.requests == []

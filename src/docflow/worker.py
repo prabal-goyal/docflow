@@ -3,6 +3,7 @@
 import logging
 import uuid
 
+import httpx2
 from celery import Task
 from celery.signals import setup_logging, task_postrun, task_prerun
 from sqlalchemy.orm import Session
@@ -10,7 +11,7 @@ from sqlalchemy.orm import Session
 from docflow.backup import backup_database
 from docflow.config import get_settings
 from docflow.db import get_engine
-from docflow.dispatch import dispatch_due, outbound_http_client
+from docflow.dispatch import dispatch_due
 from docflow.extraction import RetryableExtractionError
 from docflow.jobs import BACKUP_DATABASE_TASK, DISPATCH_WEBHOOKS_TASK, EXTRACT_TASK, get_celery
 from docflow.logs import configure_logging, correlation_id
@@ -68,7 +69,7 @@ def extract_submission(self: Task, submission_id: str) -> None:
 @celery_app.task(name=DISPATCH_WEBHOOKS_TASK)
 def dispatch_webhooks() -> int:
     """Sends due webhook deliveries. Overlapping runs are safe: claims use SKIP LOCKED."""
-    with outbound_http_client() as client:
+    with httpx2.Client() as client:
         return dispatch_due(lambda: Session(get_engine()), client, get_settings(), get_cipher())
 
 
