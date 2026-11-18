@@ -38,6 +38,13 @@ BATCH_SIZE = 20
 MAX_ERROR_CHARS = 500
 
 
+def outbound_http_client() -> httpx2.Client:
+    """HTTP client for webhook deliveries, bound to IPv4. The server's Docker network has no IPv6,
+    and without this a receiver that also has an IPv6 address fails with "Cannot assign requested
+    address" (found in production with webhook.site)."""
+    return httpx2.Client(transport=httpx2.HTTPTransport(local_address="0.0.0.0"))
+
+
 def claim_due(db: Session, limit: int = BATCH_SIZE) -> list[uuid.UUID]:
     due = (
         select(WebhookDelivery.id)
