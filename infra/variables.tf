@@ -50,3 +50,15 @@ variable "log_retention_days" {
   type        = number
   default     = 14
 }
+
+variable "github_environment" {
+  description = "GitHub environment whose deploy jobs may assume the deploy role."
+  type        = string
+  default     = "production"
+}
+
+variable "create_github_oidc_provider" {
+  description = "Create the account's GitHub OIDC provider. Set false for every environment after the first in an account."
+  type        = bool
+  default     = true
+}

@@ -1,7 +1,8 @@
 # Runbook: operating DocFlow in production
 
 Commands run from a workstation with the `docflow` AWS profile (`aws sso login --profile docflow`)
-unless they say "on the server". The server has no SSH; open a shell with Session Manager:
+unless they say "on the server". For an environment other than production, export `AWS_REGION`
+with its region and pass its SSM prefix where a script takes one. The server has no SSH; open a shell with Session Manager:
 
 ```bash
 aws ssm start-session --profile docflow --target <instance-id>    # needs the Session Manager plugin
@@ -15,6 +16,8 @@ alias dc='docker compose -f docker-compose.prod.yml'
 Merge to `main`. CI deploys after all checks pass and verifies `/ready` over HTTPS. If the
 deploy job fails, read its output (it prints the server's output), fix forward with a new commit,
 or roll back (below).
+
+Without GitHub Actions: `deploy/manual-deploy.sh` deploys the checked-out commit the same way.
 
 ## Roll back
 

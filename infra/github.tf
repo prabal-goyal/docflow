@@ -1,11 +1,32 @@
 # GitHub Actions deploys with short-lived credentials from OIDC: no AWS keys are stored in GitHub.
-# The deploy job runs in the GitHub environment "production", so its token's subject is
-# <subject prefix>:environment:production (not the branch). That environment only allows the
-# main branch (deployment branch policy, set in GitHub), so only main of this repository can deploy.
+# The deploy job runs in a GitHub environment (var.github_environment, "production"), so its
+# token's subject is <subject prefix>:environment:<name> (not the branch). That environment only
+# allows the main branch (deployment branch policy, set in GitHub), so only main can deploy.
 
+# An account can hold only one provider per URL: the first environment creates it, later
+# environments in the same account reuse it (create_github_oidc_provider = false).
 resource "aws_iam_openid_connect_provider" "github" {
+  count          = var.create_github_oidc_provider ? 1 : 0
   url            = "https://token.actions.githubusercontent.com"
   client_id_list = ["sts.amazonaws.com"]
+}
+
+moved {
+  from = aws_iam_openid_connect_provider.github
+  to   = aws_iam_openid_connect_provider.github[0]
+}
+
+data "aws_iam_openid_connect_provider" "github" {
+  count = var.create_github_oidc_provider ? 0 : 1
+  url   = "https://token.actions.githubusercontent.com"
+}
+
+locals {
+  # Exactly one of the two exists.
+  github_oidc_provider_arn = one(concat(
+    aws_iam_openid_connect_provider.github[*].arn,
+    data.aws_iam_openid_connect_provider.github[*].arn,
+  ))
 }
 
 data "aws_iam_policy_document" "github_assume" {
@@ -13,7 +34,7 @@ data "aws_iam_policy_document" "github_assume" {
     actions = ["sts:AssumeRoleWithWebIdentity"]
     principals {
       type        = "Federated"
-      identifiers = [aws_iam_openid_connect_provider.github.arn]
+      identifiers = [local.github_oidc_provider_arn]
     }
     condition {
       test     = "StringEquals"
@@ -23,7 +44,7 @@ data "aws_iam_policy_document" "github_assume" {
     condition {
       test     = "StringEquals"
       variable = "token.actions.githubusercontent.com:sub"
-      values   = ["${var.github_oidc_subject_prefix}:environment:production"]
+      values   = ["${var.github_oidc_subject_prefix}:environment:${var.github_environment}"]
     }
   }
 }

@@ -79,6 +79,21 @@ aws ssm describe-instance-information --profile docflow \
   --query "InstanceInformationList[].{id:InstanceId,ping:PingStatus}" --output table
 ```
 
+**A second environment** (staging, or a drill) in the same account goes in its own Terraform
+workspace and, simplest, its own region. The workspace name must equal the environment name (a
+guard refuses mismatches, so one environment's variables can never be applied to another's
+state; the default workspace holds `prod`), and the account's GitHub OIDC provider already exists:
+
+```bash
+terraform workspace new staging
+terraform plan -out=docflow.tfplan -var 'github_oidc_subject_prefix=<prefix>' \
+  -var environment=staging -var region=ap-southeast-1 \
+  -var create_github_oidc_provider=false -var github_environment=staging
+```
+
+Use the same `-var` values for every later `plan` and `destroy` of that environment, and its
+prefix `/docflow/staging` and region (`export AWS_REGION=ap-southeast-1`) in the commands below.
+
 The hostname is a free `<ip-with-dashes>.sslip.io` name that resolves to the server's Elastic IP;
 Caddy obtains a Let's Encrypt certificate for it on first start. To use your own domain, point an
 A record at the Elastic IP and change the `site-address` parameter (step 5 table).
@@ -88,7 +103,7 @@ A record at the Elastic IP and change the `site-address` parameter (step 5 table
 Secret values never go through Terraform (its state file would hold them in plain text).
 
 ```bash
-PREFIX=/docflow/prod
+PREFIX=/docflow/prod          # /docflow/<environment>
 aws ssm put-parameter --profile docflow --type SecureString --name "$PREFIX/db-password" \
   --value "$(python3 -c 'import secrets; print(secrets.token_urlsafe(32))')"
 aws ssm put-parameter --profile docflow --type SecureString --name "$PREFIX/jwt-secret" \
@@ -131,7 +146,8 @@ Use an OpenAI key from a dedicated project with a spend limit.
    gh variable set DOCFLOW_HOSTNAME --body "$(terraform output -raw hostname)"
    ```
 
-The deploy job is skipped until `AWS_DEPLOY_ROLE_ARN` is set.
+The deploy job is skipped until `AWS_DEPLOY_ROLE_ARN` is set. The workflow deploys one
+environment (`production`); other environments are deployed with `deploy/manual-deploy.sh`.
 
 ## 7. Deploy
 
@@ -145,12 +161,17 @@ hardening checks, then the `deploy` job:
    restart (`remote-deploy.sh`), waiting until every service is healthy;
 5. checks `https://<hostname>/ready` from the internet.
 
+**Without GitHub** (an environment GitHub does not deploy, or GitHub Actions is down), with Docker
+installed: `deploy/manual-deploy.sh` does the same steps from your machine for the commit you
+have checked out, using the selected Terraform workspace's outputs.
+
 ## 8. Create the first admin
 
 ```bash
-deploy/create-admin.sh "$(terraform -chdir=infra output -raw instance_id)" admin@example.com
+PREFIX=$(terraform -chdir=infra output -raw ssm_prefix)
+deploy/create-admin.sh "$(terraform -chdir=infra output -raw instance_id)" admin@example.com "$PREFIX"
 aws ssm get-parameter --profile docflow --with-decryption \
-  --name /docflow/prod/admin-password --query Parameter.Value --output text
+  --name "$PREFIX/admin-password" --query Parameter.Value --output text
 ```
 
 The password is generated into SSM and read there by the server; it never appears in the
@@ -174,14 +195,27 @@ Encrypt issuer. Logs appear in CloudWatch under `/docflow`, one stream per conta
 `terraform destroy` refuses to delete a non-empty S3 bucket or an ECR repository with images
 (deliberately: they hold documents and backups). To remove everything:
 
+Read the outputs first; after the destroy they are gone. For an environment in its own
+workspace, finish with `terraform -chdir=infra workspace select default` and
+`terraform -chdir=infra workspace delete <name>`.
+
 ```bash
+export AWS_REGION=$(terraform -chdir=infra output -raw region)
 BUCKET=$(terraform -chdir=infra output -raw bucket)
+PREFIX=$(terraform -chdir=infra output -raw ssm_prefix)
 aws s3 rm "s3://$BUCKET" --recursive --profile docflow
-aws ecr batch-delete-image --profile docflow --repository-name docflow \
-  --image-ids "$(aws ecr list-images --profile docflow --repository-name docflow --query imageIds --output json)"
-terraform -chdir=infra destroy -var 'github_oidc_subject_prefix=<prefix>'
+# Several passes: deleting a multi-platform image index leaves its child manifests behind.
+for _ in 1 2 3; do
+  IMAGES=$(aws ecr list-images --profile docflow --repository-name docflow --query imageIds --output json)
+  [ "$IMAGES" = "[]" ] && break
+  aws ecr batch-delete-image --profile docflow --repository-name docflow --image-ids "$IMAGES" > /dev/null
+done
+terraform -chdir=infra plan -destroy -out=destroy.tfplan \
+  -var 'github_oidc_subject_prefix=<prefix>'    # plus the environment's other -var values
+# Read the plan: it must list only this environment's resources.
+terraform -chdir=infra apply destroy.tfplan
 aws ssm delete-parameters --profile docflow --names \
-  /docflow/prod/db-password /docflow/prod/jwt-secret /docflow/prod/openai-api-key /docflow/prod/admin-password
+  "$PREFIX/db-password" "$PREFIX/jwt-secret" "$PREFIX/openai-api-key" "$PREFIX/admin-password"
 ```
 
 The KMS key is scheduled for deletion after 7 days (it can be cancelled until then).

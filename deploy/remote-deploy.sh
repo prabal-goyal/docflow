@@ -8,8 +8,10 @@ set -euo pipefail
 
 IMAGE="${1:?usage: remote-deploy.sh <image>}"
 export AWS_REGION="${AWS_REGION:?set AWS_REGION}"
-SSM_PREFIX="${SSM_PREFIX:-/docflow/prod}"
 cd /opt/docflow
+# The prefix of the last deploy (recorded by render-env.sh), so rollbacks need not repeat it.
+SSM_PREFIX="${SSM_PREFIX:-$(sed -n 's/^SSM_PREFIX=//p' .env 2>/dev/null || true)}"
+SSM_PREFIX="${SSM_PREFIX:-/docflow/prod}"
 
 bash render-env.sh "$SSM_PREFIX"
 

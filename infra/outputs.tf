@@ -28,6 +28,10 @@ output "deploy_role_arn" {
   value       = aws_iam_role.deploy.arn
 }
 
+output "region" {
+  value = var.region
+}
+
 output "ssm_prefix" {
   value = local.ssm_prefix
 }

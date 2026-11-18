@@ -35,7 +35,7 @@ Date: 2026-11-18. Status: accepted.
 | **No alarms** | Errors and outages are noticed only by looking | CloudWatch alarms on `/ready`, ERROR log lines, disk and CPU, to email or Slack |
 | `sslip.io` hostname | Depends on a free third-party DNS service | Own domain; ACM certificate on an ALB |
 | Local Terraform state | One operator at a time; state lives on one machine | S3 backend with `use_lockfile` |
-| No staging environment | Changes reach production after CI only | A second environment from the same Terraform |
+| No staging environment | Changes reach production after CI only | A second environment from the same Terraform (workspaces; proven by the drill below) |
 | No WAF | Application-level abuse is handled only by rate limiting | AWS WAF on an ALB |
 | Rollback swaps images, not schemas | A breaking migration cannot be rolled back by image alone | Expand/contract migrations (see the runbook) |
 
@@ -49,3 +49,22 @@ Date: 2026-11-18. Status: accepted.
    also closed the DNS-rebinding gap in decision 0005.
 3. **A third-party test receiver (webhook.site) is unreachable from AWS addresses.** Not a
    DocFlow fault; the production delivery check used httpbin.org instead.
+
+## Deployment drill
+
+A second, complete environment (`drill`, `ap-southeast-1`) was built by following only the
+deployment guide, verified (HTTPS, health, admin login, closed ports, logs, a deploy and a
+rollback), and destroyed, with production's plan showing no changes before and after. The drill
+found five problems, all fixed:
+
+1. The guide and scripts assumed `/docflow/prod`; a non-production rollback would have read the
+   wrong secrets. The server now records its SSM prefix at each deploy.
+2. The account's GitHub OIDC provider is a singleton; a second environment now reuses it.
+3. Nothing stopped one environment's variables being applied to another's state; a precondition
+   now ties the Terraform workspace to the environment.
+4. The scripts were not executable in git, so they failed from a fresh Linux clone.
+5. Teardown left untagged child manifests in ECR (from multi-platform image indexes); the guide
+   now deletes in passes until the repository is empty.
+
+Environments other than production are deployed with `deploy/manual-deploy.sh`, which also
+serves as the deploy path when GitHub Actions is unavailable.

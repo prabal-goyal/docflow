@@ -38,6 +38,7 @@ chmod 0600 "$OUT_DIR/docflow.env"
 # Non-secret values the compose file itself needs (read automatically from the project directory).
 cat > "$OUT_DIR/.env" <<EOF
 AWS_REGION=${REGION}
+SSM_PREFIX=${PREFIX}
 DOCFLOW_SITE_ADDRESS=$(param site-address)
 EOF
 echo "Rendered $OUT_DIR/docflow.env from $PREFIX"
