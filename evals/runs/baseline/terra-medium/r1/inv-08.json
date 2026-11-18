@@ -1,0 +1,128 @@
+{
+  "invoice_id": "inv-08",
+  "config": "terra-medium",
+  "model": "gpt-6.1-terra",
+  "effort": "medium",
+  "repeat": 1,
+  "outcome": "succeeded",
+  "error": null,
+  "invoice": {
+    "invoice_number": {
+      "value": "AC-2026-3797",
+      "source_quote": "AC-2026-3797"
+    },
+    "invoice_date": {
+      "value": "2026-01-24",
+      "source_quote": "24.01.2026"
+    },
+    "supplier_name": {
+      "value": "Acme Bohrtechnik GmbH",
+      "source_quote": "Acme Bohrtechnik GmbH"
+    },
+    "supplier_country": {
+      "value": "Germany",
+      "source_quote": "Germany"
+    },
+    "buyer_name": {
+      "value": null,
+      "source_quote": null
+    },
+    "buyer_country": {
+      "value": null,
+      "source_quote": null
+    },
+    "currency": {
+      "value": "EUR",
+      "source_quote": "EUR"
+    },
+    "line_items": [
+      {
+        "description": {
+          "value": "Tungsten carbide drill bit, 8.5 in",
+          "source_quote": "Tungsten carbide drill bit, 8.5 in"
+        },
+        "hs_code": {
+          "value": "82071910",
+          "source_quote": "8207 19 10"
+        },
+        "quantity": {
+          "value": "21",
+          "source_quote": "21"
+        },
+        "unit_price": {
+          "value": "1250.00",
+          "source_quote": "1.250,00"
+        },
+        "amount": {
+          "value": "26250.00",
+          "source_quote": "26.250,00"
+        }
+      },
+      {
+        "description": {
+          "value": "Stainless steel flange, 6 in",
+          "source_quote": "Stainless steel flange, 6 in"
+        },
+        "hs_code": {
+          "value": "73079100",
+          "source_quote": "73079100"
+        },
+        "quantity": {
+          "value": "20",
+          "source_quote": "20"
+        },
+        "unit_price": {
+          "value": "230.80",
+          "source_quote": "230,80"
+        },
+        "amount": {
+          "value": "4616.00",
+          "source_quote": "4.616,00"
+        }
+      },
+      {
+        "description": {
+          "value": "Centrifugal pump impeller",
+          "source_quote": "Centrifugal pump impeller"
+        },
+        "hs_code": {
+          "value": "84139100",
+          "source_quote": "8413.91.00"
+        },
+        "quantity": {
+          "value": "21",
+          "source_quote": "21"
+        },
+        "unit_price": {
+          "value": "1875.00",
+          "source_quote": "1.875,00"
+        },
+        "amount": {
+          "value": "39375.00",
+          "source_quote": "39.375,00"
+        }
+      }
+    ],
+    "subtotal": {
+      "value": "70241.00",
+      "source_quote": "70.241,00"
+    },
+    "tax_total": {
+      "value": "3512.05",
+      "source_quote": "3.512,05"
+    },
+    "total": {
+      "value": "73753.05",
+      "source_quote": "73.753,05"
+    }
+  },
+  "usage": {
+    "model": "gpt-6.1-terra",
+    "input_tokens": 1690,
+    "output_tokens": 483,
+    "reasoning_tokens": 0,
+    "response_id": "resp_08310b3c3ecb971b016afd3e631c1c87d0bd650921e59298b6"
+  },
+  "cost_usd": "0.004105",
+  "latency_ms": 7618
+}

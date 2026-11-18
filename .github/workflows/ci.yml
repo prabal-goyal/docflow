@@ -28,7 +28,7 @@ jobs:
       - run: uv sync --frozen
       - run: uv run ruff check .
       - run: uv run ruff format --check .
-      - run: uv run mypy src tests alembic
+      - run: uv run mypy src tests alembic evals
       - name: Migrations apply, match the models and roll back
         run: |
           uv run alembic upgrade head

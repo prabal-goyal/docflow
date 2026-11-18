@@ -1,0 +1,150 @@
+{
+  "invoice_id": "inv-27",
+  "config": "sol-medium",
+  "model": "gpt-6.1-sol",
+  "effort": "medium",
+  "repeat": 1,
+  "outcome": "succeeded",
+  "error": null,
+  "invoice": {
+    "invoice_number": {
+      "value": "NO-2026-5365",
+      "source_quote": "NO-2026-5365"
+    },
+    "invoice_date": {
+      "value": "2026-06-24",
+      "source_quote": "June 24, 2026"
+    },
+    "supplier_name": {
+      "value": "Northsea Valve Co. Ltd",
+      "source_quote": "Northsea Valve Co. Ltd"
+    },
+    "supplier_country": {
+      "value": "United Kingdom",
+      "source_quote": "United Kingdom"
+    },
+    "buyer_name": {
+      "value": "Gulf Drilling Services LLP",
+      "source_quote": "Gulf Drilling Services LLP"
+    },
+    "buyer_country": {
+      "value": "India",
+      "source_quote": "India"
+    },
+    "currency": {
+      "value": "GBP",
+      "source_quote": "GBP"
+    },
+    "line_items": [
+      {
+        "description": {
+          "value": "Stainless steel flange, 6 in",
+          "source_quote": "Stainless steel flange, 6 in"
+        },
+        "hs_code": {
+          "value": "73079100",
+          "source_quote": "7307 91 00"
+        },
+        "quantity": {
+          "value": "29",
+          "source_quote": "29"
+        },
+        "unit_price": {
+          "value": "230.80",
+          "source_quote": "230,80"
+        },
+        "amount": {
+          "value": "6693.20",
+          "source_quote": "6.693,20"
+        }
+      },
+      {
+        "description": {
+          "value": "Pressure gauge, 10k psi",
+          "source_quote": "Pressure gauge, 10k psi"
+        },
+        "hs_code": {
+          "value": "90262040",
+          "source_quote": "9026 20 40"
+        },
+        "quantity": {
+          "value": "37",
+          "source_quote": "37"
+        },
+        "unit_price": {
+          "value": "88.25",
+          "source_quote": "88,25"
+        },
+        "amount": {
+          "value": "3265.25",
+          "source_quote": "3.265,25"
+        }
+      },
+      {
+        "description": {
+          "value": "Gate valve, 4 in, API 6A",
+          "source_quote": "Gate valve, 4 in, API 6A"
+        },
+        "hs_code": {
+          "value": "84818081",
+          "source_quote": "84818081"
+        },
+        "quantity": {
+          "value": "9",
+          "source_quote": "9"
+        },
+        "unit_price": {
+          "value": "2140.00",
+          "source_quote": "2.140,00"
+        },
+        "amount": {
+          "value": "19260.00",
+          "source_quote": "19.260,00"
+        }
+      },
+      {
+        "description": {
+          "value": "Mud pump piston seal kit",
+          "source_quote": "Mud pump piston seal kit"
+        },
+        "hs_code": {
+          "value": "84842000",
+          "source_quote": "84842000"
+        },
+        "quantity": {
+          "value": "18",
+          "source_quote": "18"
+        },
+        "unit_price": {
+          "value": "310.50",
+          "source_quote": "310,50"
+        },
+        "amount": {
+          "value": "5635.00",
+          "source_quote": "5.635,00"
+        }
+      }
+    ],
+    "subtotal": {
+      "value": "34853.45",
+      "source_quote": "34.853,45"
+    },
+    "tax_total": {
+      "value": "1742.67",
+      "source_quote": "1.742,67"
+    },
+    "total": {
+      "value": "36596.12",
+      "source_quote": "36.596,12"
+    }
+  },
+  "usage": {
+    "model": "gpt-6.1-sol",
+    "input_tokens": 3645,
+    "output_tokens": 898,
+    "reasoning_tokens": 0,
+    "response_id": "resp_01dc74b0c4efe493016afd3f12588c87d09c90a0457fa1fe4b"
+  },
+  "cost_usd": "0.01627",
+  "latency_ms": 12301
+}

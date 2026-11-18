@@ -1,0 +1,150 @@
+{
+  "invoice_id": "inv-03",
+  "config": "luna-medium",
+  "model": "gpt-6-luna",
+  "effort": "medium",
+  "repeat": 2,
+  "outcome": "succeeded",
+  "error": null,
+  "invoice": {
+    "invoice_number": {
+      "value": "MI-2026-8095",
+      "source_quote": "MI-2026-8095"
+    },
+    "invoice_date": {
+      "value": "2026-03-28",
+      "source_quote": "28/03/2026"
+    },
+    "supplier_name": {
+      "value": "Milano Raccordi S.p.A.",
+      "source_quote": "Milano Raccordi S.p.A."
+    },
+    "supplier_country": {
+      "value": "Italy",
+      "source_quote": "Italy"
+    },
+    "buyer_name": {
+      "value": "Krishna Basin Exploration Pvt Ltd",
+      "source_quote": "Krishna Basin Exploration Pvt Ltd"
+    },
+    "buyer_country": {
+      "value": "India",
+      "source_quote": "India"
+    },
+    "currency": {
+      "value": "EUR",
+      "source_quote": "EUR"
+    },
+    "line_items": [
+      {
+        "description": {
+          "value": "Mud pump piston seal kit",
+          "source_quote": "Mud pump piston seal kit"
+        },
+        "hs_code": {
+          "value": "84842000",
+          "source_quote": "84842000"
+        },
+        "quantity": {
+          "value": "35",
+          "source_quote": "35"
+        },
+        "unit_price": {
+          "value": "310.50",
+          "source_quote": "310,50"
+        },
+        "amount": {
+          "value": "10867.50",
+          "source_quote": "10.867,50"
+        }
+      },
+      {
+        "description": {
+          "value": "Centrifugal pump impeller",
+          "source_quote": "Centrifugal pump impeller"
+        },
+        "hs_code": {
+          "value": "84139100",
+          "source_quote": "84139100"
+        },
+        "quantity": {
+          "value": "36",
+          "source_quote": "36"
+        },
+        "unit_price": {
+          "value": "1875.00",
+          "source_quote": "1.875,00"
+        },
+        "amount": {
+          "value": "67500.00",
+          "source_quote": "67.500,00"
+        }
+      },
+      {
+        "description": {
+          "value": "Blowout preventer ram rubber",
+          "source_quote": "Blowout preventer ram rubber"
+        },
+        "hs_code": {
+          "value": "40169390",
+          "source_quote": "4016 93 90"
+        },
+        "quantity": {
+          "value": "20",
+          "source_quote": "20"
+        },
+        "unit_price": {
+          "value": "612.00",
+          "source_quote": "612,00"
+        },
+        "amount": {
+          "value": "12240.00",
+          "source_quote": "12.240,00"
+        }
+      },
+      {
+        "description": {
+          "value": "Hydraulic hose assembly, 2 in",
+          "source_quote": "Hydraulic hose assembly, 2 in"
+        },
+        "hs_code": {
+          "value": "40094200",
+          "source_quote": "4009 42 00"
+        },
+        "quantity": {
+          "value": "33",
+          "source_quote": "33"
+        },
+        "unit_price": {
+          "value": "145.00",
+          "source_quote": "145,00"
+        },
+        "amount": {
+          "value": "4785.00",
+          "source_quote": "4.785,00"
+        }
+      }
+    ],
+    "subtotal": {
+      "value": "95392.50",
+      "source_quote": "95.392,50"
+    },
+    "tax_total": {
+      "value": "4769.62",
+      "source_quote": "4.769,62"
+    },
+    "total": {
+      "value": "100162.12",
+      "source_quote": "100.162,12"
+    }
+  },
+  "usage": {
+    "model": "gpt-6-luna",
+    "input_tokens": 1745,
+    "output_tokens": 1036,
+    "reasoning_tokens": 143,
+    "response_id": "resp_007fe7e3517ba6ba016afd3d8991bc87d0974bb1ab6ed3f0cc"
+  },
+  "cost_usd": "0.0006925",
+  "latency_ms": 8455
+}

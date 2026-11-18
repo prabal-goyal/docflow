@@ -1,0 +1,106 @@
+{
+  "invoice_id": "inv-20",
+  "config": "terra-medium",
+  "model": "gpt-6.1-terra",
+  "effort": "medium",
+  "repeat": 2,
+  "outcome": "succeeded",
+  "error": null,
+  "invoice": {
+    "invoice_number": {
+      "value": "MI-2026-6630",
+      "source_quote": "MI-2026-6630"
+    },
+    "invoice_date": {
+      "value": "2026-08-14",
+      "source_quote": "August 14, 2026"
+    },
+    "supplier_name": {
+      "value": "Milano Raccordi S.p.A.",
+      "source_quote": "Milano Raccordi S.p.A."
+    },
+    "supplier_country": {
+      "value": "Italy",
+      "source_quote": "Italy"
+    },
+    "buyer_name": {
+      "value": "Gulf Drilling Services LLP",
+      "source_quote": "Gulf Drilling Services LLP"
+    },
+    "buyer_country": {
+      "value": "India",
+      "source_quote": "India"
+    },
+    "currency": {
+      "value": "EUR",
+      "source_quote": "EUR"
+    },
+    "line_items": [
+      {
+        "description": {
+          "value": "Blowout preventer ram rubber",
+          "source_quote": "Blowout preventer ram rubber"
+        },
+        "hs_code": {
+          "value": "40169390",
+          "source_quote": "4016 93 90"
+        },
+        "quantity": {
+          "value": "26",
+          "source_quote": "26"
+        },
+        "unit_price": {
+          "value": "612.00",
+          "source_quote": "612,00"
+        },
+        "amount": {
+          "value": "15958.00",
+          "source_quote": "15.958,00"
+        }
+      },
+      {
+        "description": {
+          "value": "Drill pipe thread protector",
+          "source_quote": "Drill pipe thread protector"
+        },
+        "hs_code": {
+          "value": "73269099",
+          "source_quote": "7326.90.99"
+        },
+        "quantity": {
+          "value": "24",
+          "source_quote": "24"
+        },
+        "unit_price": {
+          "value": "18.75",
+          "source_quote": "18,75"
+        },
+        "amount": {
+          "value": "450.00",
+          "source_quote": "450,00"
+        }
+      }
+    ],
+    "subtotal": {
+      "value": "16408.00",
+      "source_quote": "16.408,00"
+    },
+    "tax_total": {
+      "value": "2953.44",
+      "source_quote": "2.953,44"
+    },
+    "total": {
+      "value": "19361.44",
+      "source_quote": "19.361,44"
+    }
+  },
+  "usage": {
+    "model": "gpt-6.1-terra",
+    "input_tokens": 805,
+    "output_tokens": 384,
+    "reasoning_tokens": 0,
+    "response_id": "resp_09c7c8c2bdb8b8d4016afd3ebc12ec87d0b47fac4fe6691e1d"
+  },
+  "cost_usd": "0.002725",
+  "latency_ms": 6261
+}

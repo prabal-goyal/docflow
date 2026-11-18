@@ -1,0 +1,150 @@
+{
+  "invoice_id": "inv-25",
+  "config": "sol-medium",
+  "model": "gpt-6.1-sol",
+  "effort": "medium",
+  "repeat": 2,
+  "outcome": "succeeded",
+  "error": null,
+  "invoice": {
+    "invoice_number": {
+      "value": "NO-2026-6654",
+      "source_quote": "NO-2026-6654"
+    },
+    "invoice_date": {
+      "value": "2026-02-15",
+      "source_quote": "15/02/2026"
+    },
+    "supplier_name": {
+      "value": "Northsea Valve Co. Ltd",
+      "source_quote": "Northsea Valve Co. Ltd"
+    },
+    "supplier_country": {
+      "value": "United Kingdom",
+      "source_quote": "United Kingdom"
+    },
+    "buyer_name": {
+      "value": null,
+      "source_quote": null
+    },
+    "buyer_country": {
+      "value": null,
+      "source_quote": null
+    },
+    "currency": {
+      "value": "GBP",
+      "source_quote": "GBP"
+    },
+    "line_items": [
+      {
+        "description": {
+          "value": "Valve stem packing set",
+          "source_quote": "Valve stem packing set"
+        },
+        "hs_code": {
+          "value": "84849000",
+          "source_quote": "84849000"
+        },
+        "quantity": {
+          "value": "31",
+          "source_quote": "31"
+        },
+        "unit_price": {
+          "value": "96.40",
+          "source_quote": "96,40"
+        },
+        "amount": {
+          "value": "2988.40",
+          "source_quote": "2 988,40"
+        }
+      },
+      {
+        "description": {
+          "value": "Stainless steel flange, 6 in",
+          "source_quote": "Stainless steel flange, 6 in"
+        },
+        "hs_code": {
+          "value": "73079100",
+          "source_quote": "7307 91 00"
+        },
+        "quantity": {
+          "value": "8",
+          "source_quote": "8"
+        },
+        "unit_price": {
+          "value": "230.80",
+          "source_quote": "230,80"
+        },
+        "amount": {
+          "value": "1846.40",
+          "source_quote": "1 846,40"
+        }
+      },
+      {
+        "description": {
+          "value": "Mud pump piston seal kit",
+          "source_quote": "Mud pump piston seal kit"
+        },
+        "hs_code": {
+          "value": "84842000",
+          "source_quote": "8484.20.00"
+        },
+        "quantity": {
+          "value": "34",
+          "source_quote": "34"
+        },
+        "unit_price": {
+          "value": "310.50",
+          "source_quote": "310,50"
+        },
+        "amount": {
+          "value": "10557.00",
+          "source_quote": "10 557,00"
+        }
+      },
+      {
+        "description": {
+          "value": "Drill pipe thread protector",
+          "source_quote": "Drill pipe thread protector"
+        },
+        "hs_code": {
+          "value": "73269099",
+          "source_quote": "7326 90 99"
+        },
+        "quantity": {
+          "value": "23",
+          "source_quote": "23"
+        },
+        "unit_price": {
+          "value": "18.75",
+          "source_quote": "18,75"
+        },
+        "amount": {
+          "value": "431.25",
+          "source_quote": "431,25"
+        }
+      }
+    ],
+    "subtotal": {
+      "value": "15823.05",
+      "source_quote": "15 823,05"
+    },
+    "tax_total": {
+      "value": "791.15",
+      "source_quote": "791,15"
+    },
+    "total": {
+      "value": "16614.20",
+      "source_quote": "16 614,20"
+    }
+  },
+  "usage": {
+    "model": "gpt-6.1-sol",
+    "input_tokens": 3645,
+    "output_tokens": 859,
+    "reasoning_tokens": 0,
+    "response_id": "resp_0a58a2f2cab4a98a016afd3f535eb487d0906c58828d033fcf"
+  },
+  "cost_usd": "0.01588",
+  "latency_ms": 10330
+}

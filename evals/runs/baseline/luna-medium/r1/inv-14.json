@@ -1,0 +1,84 @@
+{
+  "invoice_id": "inv-14",
+  "config": "luna-medium",
+  "model": "gpt-6-luna",
+  "effort": "medium",
+  "repeat": 1,
+  "outcome": "succeeded",
+  "error": null,
+  "invoice": {
+    "invoice_number": {
+      "value": "KA-2026-2580",
+      "source_quote": "Invoice No: KA-2026-2580"
+    },
+    "invoice_date": {
+      "value": "2026-05-15",
+      "source_quote": "Invoice Date: 2026-05-15"
+    },
+    "supplier_name": {
+      "value": "Kaveri Hydraulics Pvt Ltd",
+      "source_quote": "Kaveri Hydraulics Pvt Ltd"
+    },
+    "supplier_country": {
+      "value": "India",
+      "source_quote": "Supplier address: Industrial Estate 4, India"
+    },
+    "buyer_name": {
+      "value": "Western Offshore Energy Ltd",
+      "source_quote": "Bill to: Western Offshore Energy Ltd, India"
+    },
+    "buyer_country": {
+      "value": "India",
+      "source_quote": "Bill to: Western Offshore Energy Ltd, India"
+    },
+    "currency": {
+      "value": "USD",
+      "source_quote": "Currency: USD"
+    },
+    "line_items": [
+      {
+        "description": {
+          "value": "Pressure gauge, 10k psi",
+          "source_quote": "Pressure gauge, 10k psi"
+        },
+        "hs_code": {
+          "value": "90262040",
+          "source_quote": "90262040"
+        },
+        "quantity": {
+          "value": "17",
+          "source_quote": "17"
+        },
+        "unit_price": {
+          "value": "88.25",
+          "source_quote": "88.25"
+        },
+        "amount": {
+          "value": "1500.25",
+          "source_quote": "1,500.25"
+        }
+      }
+    ],
+    "subtotal": {
+      "value": "1500.25",
+      "source_quote": "Subtotal: 1,500.25"
+    },
+    "tax_total": {
+      "value": "0.00",
+      "source_quote": "VAT 0%: 0.00"
+    },
+    "total": {
+      "value": "1500.25",
+      "source_quote": "Total USD: 1,500.25"
+    }
+  },
+  "usage": {
+    "model": "gpt-6-luna",
+    "input_tokens": 1585,
+    "output_tokens": 570,
+    "reasoning_tokens": 77,
+    "response_id": "resp_050ae589d8b434b6016afd3d56753c87d0a1101cd5c4229bb0"
+  },
+  "cost_usd": "0.0004435",
+  "latency_ms": 6689
+}

@@ -1,0 +1,165 @@
+{
+  "id": "inv-04",
+  "split": "test",
+  "issue": "clean",
+  "scanned": false,
+  "layout": "european",
+  "number_style": "de",
+  "date_style": "dmy_dot",
+  "fields": {
+    "invoice_number": {
+      "value": "NO-2026-2611",
+      "source_quote": "NO-2026-2611"
+    },
+    "invoice_date": {
+      "value": "2026-01-17",
+      "source_quote": "17.01.2026"
+    },
+    "supplier_name": {
+      "value": "Northsea Valve Co. Ltd",
+      "source_quote": "Northsea Valve Co. Ltd"
+    },
+    "supplier_country": {
+      "value": "United Kingdom",
+      "source_quote": "United Kingdom"
+    },
+    "buyer_name": {
+      "value": "Western Offshore Energy Ltd",
+      "source_quote": "Western Offshore Energy Ltd"
+    },
+    "buyer_country": {
+      "value": "India",
+      "source_quote": "India"
+    },
+    "currency": {
+      "value": "GBP",
+      "source_quote": "GBP"
+    },
+    "line_items": [
+      {
+        "description": {
+          "value": "Centrifugal pump impeller",
+          "source_quote": "Centrifugal pump impeller"
+        },
+        "hs_code": {
+          "value": "84139100",
+          "source_quote": "8413 91 00"
+        },
+        "quantity": {
+          "value": "17",
+          "source_quote": "17"
+        },
+        "unit_price": {
+          "value": "1875.00",
+          "source_quote": "1.875,00"
+        },
+        "amount": {
+          "value": "31875.00",
+          "source_quote": "31.875,00"
+        }
+      },
+      {
+        "description": {
+          "value": "Blowout preventer ram rubber",
+          "source_quote": "Blowout preventer ram rubber"
+        },
+        "hs_code": {
+          "value": "40169390",
+          "source_quote": "40169390"
+        },
+        "quantity": {
+          "value": "32",
+          "source_quote": "32"
+        },
+        "unit_price": {
+          "value": "612.00",
+          "source_quote": "612,00"
+        },
+        "amount": {
+          "value": "19584.00",
+          "source_quote": "19.584,00"
+        }
+      },
+      {
+        "description": {
+          "value": "Stainless steel flange, 6 in",
+          "source_quote": "Stainless steel flange, 6 in"
+        },
+        "hs_code": {
+          "value": "73079100",
+          "source_quote": "73079100"
+        },
+        "quantity": {
+          "value": "33",
+          "source_quote": "33"
+        },
+        "unit_price": {
+          "value": "230.80",
+          "source_quote": "230,80"
+        },
+        "amount": {
+          "value": "7616.40",
+          "source_quote": "7.616,40"
+        }
+      },
+      {
+        "description": {
+          "value": "Drill pipe thread protector",
+          "source_quote": "Drill pipe thread protector"
+        },
+        "hs_code": {
+          "value": "73269099",
+          "source_quote": "7326 90 99"
+        },
+        "quantity": {
+          "value": "28",
+          "source_quote": "28"
+        },
+        "unit_price": {
+          "value": "18.75",
+          "source_quote": "18,75"
+        },
+        "amount": {
+          "value": "525.00",
+          "source_quote": "525,00"
+        }
+      },
+      {
+        "description": {
+          "value": "Mud pump piston seal kit",
+          "source_quote": "Mud pump piston seal kit"
+        },
+        "hs_code": {
+          "value": "84842000",
+          "source_quote": "84842000"
+        },
+        "quantity": {
+          "value": "3",
+          "source_quote": "3"
+        },
+        "unit_price": {
+          "value": "310.50",
+          "source_quote": "310,50"
+        },
+        "amount": {
+          "value": "931.50",
+          "source_quote": "931,50"
+        }
+      }
+    ],
+    "subtotal": {
+      "value": "60531.90",
+      "source_quote": "60.531,90"
+    },
+    "tax_total": {
+      "value": "3026.60",
+      "source_quote": "3.026,60"
+    },
+    "total": {
+      "value": "63558.50",
+      "source_quote": "63.558,50"
+    }
+  },
+  "expected_flags": [],
+  "unscored": []
+}

@@ -1,0 +1,106 @@
+{
+  "invoice_id": "inv-26",
+  "config": "luna-medium",
+  "model": "gpt-6-luna",
+  "effort": "medium",
+  "repeat": 2,
+  "outcome": "succeeded",
+  "error": null,
+  "invoice": {
+    "invoice_number": {
+      "value": "AC-2026-9080",
+      "source_quote": "AC-2026-9080"
+    },
+    "invoice_date": {
+      "value": "2026-05-21",
+      "source_quote": "21/05/2026"
+    },
+    "supplier_name": {
+      "value": "Acme Bohrtechnik GmbH",
+      "source_quote": "Acme Bohrtechnik GmbH"
+    },
+    "supplier_country": {
+      "value": "Germany",
+      "source_quote": "Germany"
+    },
+    "buyer_name": {
+      "value": "Gulf Drilling Services LLP",
+      "source_quote": "Gulf Drilling Services LLP"
+    },
+    "buyer_country": {
+      "value": "India",
+      "source_quote": "India"
+    },
+    "currency": {
+      "value": "EUR",
+      "source_quote": "EUR"
+    },
+    "line_items": [
+      {
+        "description": {
+          "value": "Drill pipe thread protector",
+          "source_quote": "Drill pipe thread protector"
+        },
+        "hs_code": {
+          "value": "73269099",
+          "source_quote": "7326 90 99"
+        },
+        "quantity": {
+          "value": "28",
+          "source_quote": "28"
+        },
+        "unit_price": {
+          "value": "18.75",
+          "source_quote": "18,75"
+        },
+        "amount": {
+          "value": "525.00",
+          "source_quote": "525,00"
+        }
+      },
+      {
+        "description": {
+          "value": "Hydraulic hose assembly, 2 in",
+          "source_quote": "Hydraulic hose assembly, 2 in"
+        },
+        "hs_code": {
+          "value": "4009",
+          "source_quote": "40-09-B"
+        },
+        "quantity": {
+          "value": "36",
+          "source_quote": "36"
+        },
+        "unit_price": {
+          "value": "145.00",
+          "source_quote": "145,00"
+        },
+        "amount": {
+          "value": "5220.00",
+          "source_quote": "5 220,00"
+        }
+      }
+    ],
+    "subtotal": {
+      "value": "5745.00",
+      "source_quote": "5 745,00"
+    },
+    "tax_total": {
+      "value": "0.00",
+      "source_quote": "0,00"
+    },
+    "total": {
+      "value": "5745.00",
+      "source_quote": "5 745,00"
+    }
+  },
+  "usage": {
+    "model": "gpt-6-luna",
+    "input_tokens": 1710,
+    "output_tokens": 1038,
+    "reasoning_tokens": 445,
+    "response_id": "resp_0f7e826506e0b6cf016afd3dbc9e7c87d0846693ab1fd24179"
+  },
+  "cost_usd": "0.00069",
+  "latency_ms": 9746
+}

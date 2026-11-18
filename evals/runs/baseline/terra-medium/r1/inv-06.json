@@ -1,0 +1,172 @@
+{
+  "invoice_id": "inv-06",
+  "config": "terra-medium",
+  "model": "gpt-6.1-terra",
+  "effort": "medium",
+  "repeat": 1,
+  "outcome": "succeeded",
+  "error": null,
+  "invoice": {
+    "invoice_number": {
+      "value": "RO-2026-3149",
+      "source_quote": "RO-2026-3149"
+    },
+    "invoice_date": {
+      "value": "2026-04-16",
+      "source_quote": "April 16, 2026"
+    },
+    "supplier_name": {
+      "value": "Rotterdam Pump Works B.V.",
+      "source_quote": "Rotterdam Pump Works B.V."
+    },
+    "supplier_country": {
+      "value": "Netherlands",
+      "source_quote": "Netherlands"
+    },
+    "buyer_name": {
+      "value": "Krishna Basin Exploration Pvt Ltd",
+      "source_quote": "Krishna Basin Exploration Pvt Ltd"
+    },
+    "buyer_country": {
+      "value": "India",
+      "source_quote": "India"
+    },
+    "currency": {
+      "value": "EUR",
+      "source_quote": "EUR"
+    },
+    "line_items": [
+      {
+        "description": {
+          "value": "Tungsten carbide drill bit, 8.5 in",
+          "source_quote": "Tungsten carbide drill bit, 8.5 in"
+        },
+        "hs_code": {
+          "value": "82071910",
+          "source_quote": "8207.19.10"
+        },
+        "quantity": {
+          "value": "23",
+          "source_quote": "23"
+        },
+        "unit_price": {
+          "value": "1250.00",
+          "source_quote": "1.250,00"
+        },
+        "amount": {
+          "value": "28750.00",
+          "source_quote": "28.750,00"
+        }
+      },
+      {
+        "description": {
+          "value": "Blowout preventer ram rubber",
+          "source_quote": "Blowout preventer ram rubber"
+        },
+        "hs_code": {
+          "value": "40169390",
+          "source_quote": "40169390"
+        },
+        "quantity": {
+          "value": "1",
+          "source_quote": "1"
+        },
+        "unit_price": {
+          "value": "612.00",
+          "source_quote": "612,00"
+        },
+        "amount": {
+          "value": "612.00",
+          "source_quote": "612,00"
+        }
+      },
+      {
+        "description": {
+          "value": "Valve stem packing set",
+          "source_quote": "Valve stem packing set"
+        },
+        "hs_code": {
+          "value": "84849000",
+          "source_quote": "8484 90 00"
+        },
+        "quantity": {
+          "value": "38",
+          "source_quote": "38"
+        },
+        "unit_price": {
+          "value": "96.40",
+          "source_quote": "96,40"
+        },
+        "amount": {
+          "value": "3663.20",
+          "source_quote": "3.663,20"
+        }
+      },
+      {
+        "description": {
+          "value": "Hydraulic hose assembly, 2 in",
+          "source_quote": "Hydraulic hose assembly, 2 in"
+        },
+        "hs_code": {
+          "value": "40094200",
+          "source_quote": "4009 42 00"
+        },
+        "quantity": {
+          "value": "32",
+          "source_quote": "32"
+        },
+        "unit_price": {
+          "value": "145.00",
+          "source_quote": "145,00"
+        },
+        "amount": {
+          "value": "4640.00",
+          "source_quote": "4.640,00"
+        }
+      },
+      {
+        "description": {
+          "value": "Pressure gauge, 10k psi",
+          "source_quote": "Pressure gauge, 10k psi"
+        },
+        "hs_code": {
+          "value": "90262040",
+          "source_quote": "9026 20 40"
+        },
+        "quantity": {
+          "value": "9",
+          "source_quote": "9"
+        },
+        "unit_price": {
+          "value": "88.25",
+          "source_quote": "88,25"
+        },
+        "amount": {
+          "value": "794.25",
+          "source_quote": "794,25"
+        }
+      }
+    ],
+    "subtotal": {
+      "value": "38459.45",
+      "source_quote": "38.459,45"
+    },
+    "tax_total": {
+      "value": "0.00",
+      "source_quote": "0,00"
+    },
+    "total": {
+      "value": "38459.45",
+      "source_quote": "38.459,45"
+    }
+  },
+  "usage": {
+    "model": "gpt-6.1-terra",
+    "input_tokens": 1924,
+    "output_tokens": 662,
+    "reasoning_tokens": 0,
+    "response_id": "resp_04a09ecfbac6f379016afd3e59e18487d089ea78cc465d5d68"
+  },
+  "cost_usd": "0.005234",
+  "latency_ms": 9195
+}

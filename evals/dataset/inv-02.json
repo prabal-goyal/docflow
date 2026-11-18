@@ -1,0 +1,165 @@
+{
+  "id": "inv-02",
+  "split": "test",
+  "issue": "clean",
+  "scanned": false,
+  "layout": "text",
+  "number_style": "fr",
+  "date_style": "dmy_slash",
+  "fields": {
+    "invoice_number": {
+      "value": "LY-2026-2680",
+      "source_quote": "LY-2026-2680"
+    },
+    "invoice_date": {
+      "value": "2026-02-26",
+      "source_quote": "26/02/2026"
+    },
+    "supplier_name": {
+      "value": "Lyon Forage SAS",
+      "source_quote": "Lyon Forage SAS"
+    },
+    "supplier_country": {
+      "value": "France",
+      "source_quote": "France"
+    },
+    "buyer_name": {
+      "value": "Gulf Drilling Services LLP",
+      "source_quote": "Gulf Drilling Services LLP"
+    },
+    "buyer_country": {
+      "value": "India",
+      "source_quote": "India"
+    },
+    "currency": {
+      "value": "EUR",
+      "source_quote": "EUR"
+    },
+    "line_items": [
+      {
+        "description": {
+          "value": "Stainless steel flange, 6 in",
+          "source_quote": "Stainless steel flange, 6 in"
+        },
+        "hs_code": {
+          "value": "73079100",
+          "source_quote": "7307 91 00"
+        },
+        "quantity": {
+          "value": "27",
+          "source_quote": "27"
+        },
+        "unit_price": {
+          "value": "230.80",
+          "source_quote": "230,80"
+        },
+        "amount": {
+          "value": "6231.60",
+          "source_quote": "6 231,60"
+        }
+      },
+      {
+        "description": {
+          "value": "Centrifugal pump impeller",
+          "source_quote": "Centrifugal pump impeller"
+        },
+        "hs_code": {
+          "value": "84139100",
+          "source_quote": "8413 91 00"
+        },
+        "quantity": {
+          "value": "31",
+          "source_quote": "31"
+        },
+        "unit_price": {
+          "value": "1875.00",
+          "source_quote": "1 875,00"
+        },
+        "amount": {
+          "value": "58125.00",
+          "source_quote": "58 125,00"
+        }
+      },
+      {
+        "description": {
+          "value": "Pressure gauge, 10k psi",
+          "source_quote": "Pressure gauge, 10k psi"
+        },
+        "hs_code": {
+          "value": "90262040",
+          "source_quote": "9026.20.40"
+        },
+        "quantity": {
+          "value": "34",
+          "source_quote": "34"
+        },
+        "unit_price": {
+          "value": "88.25",
+          "source_quote": "88,25"
+        },
+        "amount": {
+          "value": "3000.50",
+          "source_quote": "3 000,50"
+        }
+      },
+      {
+        "description": {
+          "value": "Valve stem packing set",
+          "source_quote": "Valve stem packing set"
+        },
+        "hs_code": {
+          "value": "84849000",
+          "source_quote": "8484.90.00"
+        },
+        "quantity": {
+          "value": "37",
+          "source_quote": "37"
+        },
+        "unit_price": {
+          "value": "96.40",
+          "source_quote": "96,40"
+        },
+        "amount": {
+          "value": "3566.80",
+          "source_quote": "3 566,80"
+        }
+      },
+      {
+        "description": {
+          "value": "Drill pipe thread protector",
+          "source_quote": "Drill pipe thread protector"
+        },
+        "hs_code": {
+          "value": "73269099",
+          "source_quote": "7326.90.99"
+        },
+        "quantity": {
+          "value": "9",
+          "source_quote": "9"
+        },
+        "unit_price": {
+          "value": "18.75",
+          "source_quote": "18,75"
+        },
+        "amount": {
+          "value": "168.75",
+          "source_quote": "168,75"
+        }
+      }
+    ],
+    "subtotal": {
+      "value": "71092.65",
+      "source_quote": "71 092,65"
+    },
+    "tax_total": {
+      "value": "3554.63",
+      "source_quote": "3 554,63"
+    },
+    "total": {
+      "value": "74647.28",
+      "source_quote": "74 647,28"
+    }
+  },
+  "expected_flags": [],
+  "unscored": []
+}

@@ -1,0 +1,172 @@
+{
+  "invoice_id": "inv-22",
+  "config": "terra-medium",
+  "model": "gpt-6.1-terra",
+  "effort": "medium",
+  "repeat": 2,
+  "outcome": "succeeded",
+  "error": null,
+  "invoice": {
+    "invoice_number": {
+      "value": "KA-2026-6085",
+      "source_quote": "KA-2026-6085"
+    },
+    "invoice_date": {
+      "value": "2026-01-19",
+      "source_quote": "19.01.2026"
+    },
+    "supplier_name": {
+      "value": "Kaveri Hydraulics Pvt Ltd",
+      "source_quote": "Kaveri Hydraulics Pvt Ltd"
+    },
+    "supplier_country": {
+      "value": "India",
+      "source_quote": "India"
+    },
+    "buyer_name": {
+      "value": null,
+      "source_quote": null
+    },
+    "buyer_country": {
+      "value": null,
+      "source_quote": null
+    },
+    "currency": {
+      "value": "USD",
+      "source_quote": "USD"
+    },
+    "line_items": [
+      {
+        "description": {
+          "value": "Valve stem packing set",
+          "source_quote": "Valve stem packing set"
+        },
+        "hs_code": {
+          "value": "84849000",
+          "source_quote": "8484 90 00"
+        },
+        "quantity": {
+          "value": "34",
+          "source_quote": "34"
+        },
+        "unit_price": {
+          "value": "96.40",
+          "source_quote": "96,40"
+        },
+        "amount": {
+          "value": "3277.60",
+          "source_quote": "3.277,60"
+        }
+      },
+      {
+        "description": {
+          "value": "Tungsten carbide drill bit, 8.5 in",
+          "source_quote": "Tungsten carbide drill bit, 8.5 in"
+        },
+        "hs_code": {
+          "value": "82071910",
+          "source_quote": "8207 19 10"
+        },
+        "quantity": {
+          "value": "11",
+          "source_quote": "11"
+        },
+        "unit_price": {
+          "value": "1250.00",
+          "source_quote": "1.250,00"
+        },
+        "amount": {
+          "value": "13750.00",
+          "source_quote": "13.750,00"
+        }
+      },
+      {
+        "description": {
+          "value": "Pressure gauge, 10k psi",
+          "source_quote": "Pressure gauge, 10k psi"
+        },
+        "hs_code": {
+          "value": "90262040",
+          "source_quote": "9026.20.40"
+        },
+        "quantity": {
+          "value": "7",
+          "source_quote": "7"
+        },
+        "unit_price": {
+          "value": "88.25",
+          "source_quote": "88,25"
+        },
+        "amount": {
+          "value": "617.75",
+          "source_quote": "617,75"
+        }
+      },
+      {
+        "description": {
+          "value": "Gate valve, 4 in, API 6A",
+          "source_quote": "Gate valve, 4 in, API 6A"
+        },
+        "hs_code": {
+          "value": "84818081",
+          "source_quote": "8481 80 81"
+        },
+        "quantity": {
+          "value": "10",
+          "source_quote": "10"
+        },
+        "unit_price": {
+          "value": "2140.00",
+          "source_quote": "2.140,00"
+        },
+        "amount": {
+          "value": "21400.00",
+          "source_quote": "21.400,00"
+        }
+      },
+      {
+        "description": {
+          "value": "Stainless steel flange, 6 in",
+          "source_quote": "Stainless steel flange, 6 in"
+        },
+        "hs_code": {
+          "value": "73079100",
+          "source_quote": "73079100"
+        },
+        "quantity": {
+          "value": "25",
+          "source_quote": "25"
+        },
+        "unit_price": {
+          "value": "230.80",
+          "source_quote": "230,80"
+        },
+        "amount": {
+          "value": "5770.00",
+          "source_quote": "5.770,00"
+        }
+      }
+    ],
+    "subtotal": {
+      "value": "44815.35",
+      "source_quote": "44.815,35"
+    },
+    "tax_total": {
+      "value": "8066.76",
+      "source_quote": "8.066,76"
+    },
+    "total": {
+      "value": "52882.11",
+      "source_quote": "52.882,11"
+    }
+  },
+  "usage": {
+    "model": "gpt-6.1-terra",
+    "input_tokens": 901,
+    "output_tokens": 704,
+    "reasoning_tokens": 34,
+    "response_id": "resp_09681faa7ae94fd9016afd3ec2b07887d0bd15132956839e16"
+  },
+  "cost_usd": "0.004421",
+  "latency_ms": 10547
+}

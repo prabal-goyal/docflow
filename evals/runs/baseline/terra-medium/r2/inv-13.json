@@ -1,0 +1,172 @@
+{
+  "invoice_id": "inv-13",
+  "config": "terra-medium",
+  "model": "gpt-6.1-terra",
+  "effort": "medium",
+  "repeat": 2,
+  "outcome": "succeeded",
+  "error": null,
+  "invoice": {
+    "invoice_number": {
+      "value": "RO-2026-2047",
+      "source_quote": "RO-2026-2047"
+    },
+    "invoice_date": {
+      "value": "2026-10-22",
+      "source_quote": "October 22, 2026"
+    },
+    "supplier_name": {
+      "value": "Rotterdam Pump Works B.V.",
+      "source_quote": "Rotterdam Pump Works B.V."
+    },
+    "supplier_country": {
+      "value": "Netherlands",
+      "source_quote": "Netherlands"
+    },
+    "buyer_name": {
+      "value": "Krishna Basin Exploration Pvt Ltd",
+      "source_quote": "Krishna Basin Exploration Pvt Ltd"
+    },
+    "buyer_country": {
+      "value": "India",
+      "source_quote": "India"
+    },
+    "currency": {
+      "value": "EUR",
+      "source_quote": "EUR"
+    },
+    "line_items": [
+      {
+        "description": {
+          "value": "Valve stem packing set",
+          "source_quote": "Valve stem packing set"
+        },
+        "hs_code": {
+          "value": "84849000",
+          "source_quote": "84849000"
+        },
+        "quantity": {
+          "value": "7",
+          "source_quote": "7"
+        },
+        "unit_price": {
+          "value": "96.40",
+          "source_quote": "96,40"
+        },
+        "amount": {
+          "value": "674.80",
+          "source_quote": "674,80"
+        }
+      },
+      {
+        "description": {
+          "value": "Blowout preventer ram rubber",
+          "source_quote": "Blowout preventer ram rubber"
+        },
+        "hs_code": {
+          "value": "40169390",
+          "source_quote": "4016.93.90"
+        },
+        "quantity": {
+          "value": "11",
+          "source_quote": "11"
+        },
+        "unit_price": {
+          "value": "612.00",
+          "source_quote": "612,00"
+        },
+        "amount": {
+          "value": "6732.00",
+          "source_quote": "6.732,00"
+        }
+      },
+      {
+        "description": {
+          "value": "Drill pipe thread protector",
+          "source_quote": "Drill pipe thread protector"
+        },
+        "hs_code": {
+          "value": "73269099",
+          "source_quote": "73269099"
+        },
+        "quantity": {
+          "value": "4",
+          "source_quote": "4"
+        },
+        "unit_price": {
+          "value": "18.75",
+          "source_quote": "18,75"
+        },
+        "amount": {
+          "value": "75.00",
+          "source_quote": "75,00"
+        }
+      },
+      {
+        "description": {
+          "value": "Tungsten carbide drill bit, 8.5 in",
+          "source_quote": "Tungsten carbide drill bit, 8.5 in"
+        },
+        "hs_code": {
+          "value": "82071910",
+          "source_quote": "8207 19 10"
+        },
+        "quantity": {
+          "value": "12",
+          "source_quote": "12"
+        },
+        "unit_price": {
+          "value": "1250.00",
+          "source_quote": "1.250,00"
+        },
+        "amount": {
+          "value": "15000.00",
+          "source_quote": "15.000,00"
+        }
+      },
+      {
+        "description": {
+          "value": "Centrifugal pump impeller",
+          "source_quote": "Centrifugal pump impeller"
+        },
+        "hs_code": {
+          "value": "84139100",
+          "source_quote": "8413 91 00"
+        },
+        "quantity": {
+          "value": "7",
+          "source_quote": "7"
+        },
+        "unit_price": {
+          "value": "1875.00",
+          "source_quote": "1.875,00"
+        },
+        "amount": {
+          "value": "13125.00",
+          "source_quote": "13.125,00"
+        }
+      }
+    ],
+    "subtotal": {
+      "value": "35606.80",
+      "source_quote": "35.606,80"
+    },
+    "tax_total": {
+      "value": "6409.22",
+      "source_quote": "6.409,22"
+    },
+    "total": {
+      "value": "42016.02",
+      "source_quote": "42.016,02"
+    }
+  },
+  "usage": {
+    "model": "gpt-6.1-terra",
+    "input_tokens": 1973,
+    "output_tokens": 659,
+    "reasoning_tokens": 0,
+    "response_id": "resp_0031cc8ce195a187016afd3ead92d887d0be7945d4a820f940"
+  },
+  "cost_usd": "0.005268",
+  "latency_ms": 10143
+}

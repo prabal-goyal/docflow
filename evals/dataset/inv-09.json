@@ -1,0 +1,154 @@
+{
+  "id": "inv-09",
+  "split": "dev",
+  "issue": "bad_hs",
+  "scanned": true,
+  "layout": "european",
+  "number_style": "fr",
+  "date_style": "long",
+  "fields": {
+    "invoice_number": {
+      "value": "NO-2026-4088",
+      "source_quote": "NO-2026-4088"
+    },
+    "invoice_date": {
+      "value": "2026-07-23",
+      "source_quote": "July 23, 2026"
+    },
+    "supplier_name": {
+      "value": "Northsea Valve Co. Ltd",
+      "source_quote": "Northsea Valve Co. Ltd"
+    },
+    "supplier_country": {
+      "value": "United Kingdom",
+      "source_quote": "United Kingdom"
+    },
+    "buyer_name": {
+      "value": "Krishna Basin Exploration Pvt Ltd",
+      "source_quote": "Krishna Basin Exploration Pvt Ltd"
+    },
+    "buyer_country": {
+      "value": "India",
+      "source_quote": "India"
+    },
+    "currency": {
+      "value": "GBP",
+      "source_quote": "GBP"
+    },
+    "line_items": [
+      {
+        "description": {
+          "value": "Stainless steel flange, 6 in",
+          "source_quote": "Stainless steel flange, 6 in"
+        },
+        "hs_code": {
+          "value": "73079100",
+          "source_quote": "7307.91.00"
+        },
+        "quantity": {
+          "value": "26",
+          "source_quote": "26"
+        },
+        "unit_price": {
+          "value": "230.80",
+          "source_quote": "230,80"
+        },
+        "amount": {
+          "value": "6000.80",
+          "source_quote": "6 000,80"
+        }
+      },
+      {
+        "description": {
+          "value": "Gate valve, 4 in, API 6A",
+          "source_quote": "Gate valve, 4 in, API 6A"
+        },
+        "hs_code": {
+          "value": "84818081",
+          "source_quote": "8481 80 81"
+        },
+        "quantity": {
+          "value": "13",
+          "source_quote": "13"
+        },
+        "unit_price": {
+          "value": "2140.00",
+          "source_quote": "2 140,00"
+        },
+        "amount": {
+          "value": "27820.00",
+          "source_quote": "27 820,00"
+        }
+      },
+      {
+        "description": {
+          "value": "Mud pump piston seal kit",
+          "source_quote": "Mud pump piston seal kit"
+        },
+        "hs_code": {
+          "value": "84842000",
+          "source_quote": "8484.20.00"
+        },
+        "quantity": {
+          "value": "12",
+          "source_quote": "12"
+        },
+        "unit_price": {
+          "value": "310.50",
+          "source_quote": "310,50"
+        },
+        "amount": {
+          "value": "3726.00",
+          "source_quote": "3 726,00"
+        }
+      },
+      {
+        "description": {
+          "value": "Valve stem packing set",
+          "source_quote": "Valve stem packing set"
+        },
+        "hs_code": {
+          "value": "84849000",
+          "source_quote": "8484.90.1O"
+        },
+        "quantity": {
+          "value": "35",
+          "source_quote": "35"
+        },
+        "unit_price": {
+          "value": "96.40",
+          "source_quote": "96,40"
+        },
+        "amount": {
+          "value": "3374.00",
+          "source_quote": "3 374,00"
+        }
+      }
+    ],
+    "subtotal": {
+      "value": "40920.80",
+      "source_quote": "40 920,80"
+    },
+    "tax_total": {
+      "value": "7365.74",
+      "source_quote": "7 365,74"
+    },
+    "total": {
+      "value": "48286.54",
+      "source_quote": "48 286,54"
+    }
+  },
+  "expected_flags": [
+    {
+      "field": "line_items[3].hs_code",
+      "code": "invalid_format"
+    },
+    {
+      "field": "document",
+      "code": "grounding_unverifiable"
+    }
+  ],
+  "unscored": [
+    "line_items[3].hs_code"
+  ]
+}

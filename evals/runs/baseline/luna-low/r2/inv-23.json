@@ -1,0 +1,128 @@
+{
+  "invoice_id": "inv-23",
+  "config": "luna-low",
+  "model": "gpt-6-luna",
+  "effort": "low",
+  "repeat": 2,
+  "outcome": "succeeded",
+  "error": null,
+  "invoice": {
+    "invoice_number": {
+      "value": "AC-2026-7924",
+      "source_quote": "AC-2026-7924"
+    },
+    "invoice_date": {
+      "value": "2026-03-22",
+      "source_quote": "March 22, 2026"
+    },
+    "supplier_name": {
+      "value": "Acme Bohrtechnik GmbH",
+      "source_quote": "Acme Bohrtechnik GmbH"
+    },
+    "supplier_country": {
+      "value": "Germany",
+      "source_quote": "Germany"
+    },
+    "buyer_name": {
+      "value": "Krishna Basin Exploration Pvt Ltd",
+      "source_quote": "Krishna Basin Exploration Pvt Ltd"
+    },
+    "buyer_country": {
+      "value": "India",
+      "source_quote": "India"
+    },
+    "currency": {
+      "value": "EUR",
+      "source_quote": "EUR"
+    },
+    "line_items": [
+      {
+        "description": {
+          "value": "Blowout preventer ram rubber",
+          "source_quote": "Blowout preventer ram rubber"
+        },
+        "hs_code": {
+          "value": "40169390",
+          "source_quote": "40169390"
+        },
+        "quantity": {
+          "value": "9",
+          "source_quote": "9"
+        },
+        "unit_price": {
+          "value": "612.00",
+          "source_quote": "612,00"
+        },
+        "amount": {
+          "value": "5508.00",
+          "source_quote": "5.508,00"
+        }
+      },
+      {
+        "description": {
+          "value": "Valve stem packing set",
+          "source_quote": "Valve stem packing set"
+        },
+        "hs_code": {
+          "value": "8484901",
+          "source_quote": "8484.90.1O"
+        },
+        "quantity": {
+          "value": "13",
+          "source_quote": "13"
+        },
+        "unit_price": {
+          "value": "96.40",
+          "source_quote": "96,40"
+        },
+        "amount": {
+          "value": "1253.20",
+          "source_quote": "1.253,20"
+        }
+      },
+      {
+        "description": {
+          "value": "Hydraulic hose assembly, 2 in",
+          "source_quote": "Hydraulic hose assembly, 2 in"
+        },
+        "hs_code": {
+          "value": "40094200",
+          "source_quote": "4009 42 00"
+        },
+        "quantity": {
+          "value": "1",
+          "source_quote": "1"
+        },
+        "unit_price": {
+          "value": "145.00",
+          "source_quote": "145,00"
+        },
+        "amount": {
+          "value": "145.00",
+          "source_quote": "145,00"
+        }
+      }
+    ],
+    "subtotal": {
+      "value": "6906.20",
+      "source_quote": "6.906,20"
+    },
+    "tax_total": {
+      "value": "1243.12",
+      "source_quote": "1.243,12"
+    },
+    "total": {
+      "value": "8149.32",
+      "source_quote": "8.149,32"
+    }
+  },
+  "usage": {
+    "model": "gpt-6-luna",
+    "input_tokens": 835,
+    "output_tokens": 972,
+    "reasoning_tokens": 230,
+    "response_id": "resp_00b49575d05417b9016afd3e3e63d487d0bcb757379728bbc8"
+  },
+  "cost_usd": "0.0005695",
+  "latency_ms": 9494
+}

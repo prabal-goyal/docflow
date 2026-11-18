@@ -1,0 +1,106 @@
+{
+  "invoice_id": "inv-07",
+  "config": "luna-low",
+  "model": "gpt-6-luna",
+  "effort": "low",
+  "repeat": 2,
+  "outcome": "succeeded",
+  "error": null,
+  "invoice": {
+    "invoice_number": {
+      "value": "RO-2026-7160",
+      "source_quote": "Inv # RO-2026-7160"
+    },
+    "invoice_date": {
+      "value": "2031-03-15",
+      "source_quote": "Invoice Date: 2031-03-15"
+    },
+    "supplier_name": {
+      "value": "Rotterdam Pump Works B.V.",
+      "source_quote": "Rotterdam Pump Works B.V."
+    },
+    "supplier_country": {
+      "value": "Netherlands",
+      "source_quote": "Supplier address: Industrial Estate 4, Netherlands"
+    },
+    "buyer_name": {
+      "value": "Krishna Basin Exploration Pvt Ltd",
+      "source_quote": "Krishna Basin Exploration Pvt Ltd"
+    },
+    "buyer_country": {
+      "value": "India",
+      "source_quote": "India"
+    },
+    "currency": {
+      "value": "EUR",
+      "source_quote": "Currency: EUR"
+    },
+    "line_items": [
+      {
+        "description": {
+          "value": "Drill pipe thread protector",
+          "source_quote": "Drill pipe thread protector"
+        },
+        "hs_code": {
+          "value": "73269099",
+          "source_quote": "73269099"
+        },
+        "quantity": {
+          "value": "33",
+          "source_quote": "33"
+        },
+        "unit_price": {
+          "value": "18.75",
+          "source_quote": "18.75"
+        },
+        "amount": {
+          "value": "618.75",
+          "source_quote": "618.75"
+        }
+      },
+      {
+        "description": {
+          "value": "Valve stem packing set",
+          "source_quote": "Valve stem packing set"
+        },
+        "hs_code": {
+          "value": "84849000",
+          "source_quote": "8484.90.00"
+        },
+        "quantity": {
+          "value": "25",
+          "source_quote": "25"
+        },
+        "unit_price": {
+          "value": "96.40",
+          "source_quote": "96.40"
+        },
+        "amount": {
+          "value": "2410.00",
+          "source_quote": "2,410.00"
+        }
+      }
+    ],
+    "subtotal": {
+      "value": "3028.75",
+      "source_quote": "3,028.75"
+    },
+    "tax_total": {
+      "value": "545.18",
+      "source_quote": "545.18"
+    },
+    "total": {
+      "value": "3573.93",
+      "source_quote": "3,573.93"
+    }
+  },
+  "usage": {
+    "model": "gpt-6-luna",
+    "input_tokens": 796,
+    "output_tokens": 384,
+    "reasoning_tokens": 0,
+    "response_id": "resp_0c4846f5d6eec925016afd3e1c4e1087d09f960be1f047c477"
+  },
+  "cost_usd": "0.0002716",
+  "latency_ms": 4317
+}

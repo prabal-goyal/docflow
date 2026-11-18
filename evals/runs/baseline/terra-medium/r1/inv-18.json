@@ -1,0 +1,150 @@
+{
+  "invoice_id": "inv-18",
+  "config": "terra-medium",
+  "model": "gpt-6.1-terra",
+  "effort": "medium",
+  "repeat": 1,
+  "outcome": "succeeded",
+  "error": null,
+  "invoice": {
+    "invoice_number": {
+      "value": "LY-2026-4739",
+      "source_quote": "LY-2026-4739"
+    },
+    "invoice_date": {
+      "value": "2026-07-25",
+      "source_quote": "2026-07-25"
+    },
+    "supplier_name": {
+      "value": "Lyon Forage SAS",
+      "source_quote": "Lyon Forage SAS"
+    },
+    "supplier_country": {
+      "value": "France",
+      "source_quote": "France"
+    },
+    "buyer_name": {
+      "value": "Krishna Basin Exploration Pvt Ltd",
+      "source_quote": "Krishna Basin Exploration Pvt Ltd"
+    },
+    "buyer_country": {
+      "value": "India",
+      "source_quote": "India"
+    },
+    "currency": {
+      "value": "EUR",
+      "source_quote": "EUR"
+    },
+    "line_items": [
+      {
+        "description": {
+          "value": "Gate valve, 4 in, API 6A",
+          "source_quote": "Gate valve, 4 in, API 6A"
+        },
+        "hs_code": {
+          "value": "84818081",
+          "source_quote": "8481.80.81"
+        },
+        "quantity": {
+          "value": "9",
+          "source_quote": "9"
+        },
+        "unit_price": {
+          "value": "2140.00",
+          "source_quote": "2,140.00"
+        },
+        "amount": {
+          "value": "19260.00",
+          "source_quote": "19,260.00"
+        }
+      },
+      {
+        "description": {
+          "value": "Pressure gauge, 10k psi",
+          "source_quote": "Pressure gauge, 10k psi"
+        },
+        "hs_code": {
+          "value": "90262040",
+          "source_quote": "9026.20.40"
+        },
+        "quantity": {
+          "value": "35",
+          "source_quote": "35"
+        },
+        "unit_price": {
+          "value": "88.25",
+          "source_quote": "88.25"
+        },
+        "amount": {
+          "value": "3088.75",
+          "source_quote": "3,088.75"
+        }
+      },
+      {
+        "description": {
+          "value": "Stainless steel flange, 6 in",
+          "source_quote": "Stainless steel flange, 6 in"
+        },
+        "hs_code": {
+          "value": "73079100",
+          "source_quote": "7307 91 00"
+        },
+        "quantity": {
+          "value": "35",
+          "source_quote": "35"
+        },
+        "unit_price": {
+          "value": "230.80",
+          "source_quote": "230.80"
+        },
+        "amount": {
+          "value": "8078.00",
+          "source_quote": "8,078.00"
+        }
+      },
+      {
+        "description": {
+          "value": "Blowout preventer ram rubber",
+          "source_quote": "Blowout preventer ram rubber"
+        },
+        "hs_code": {
+          "value": "40169390",
+          "source_quote": "40169390"
+        },
+        "quantity": {
+          "value": "36",
+          "source_quote": "36"
+        },
+        "unit_price": {
+          "value": "612.00",
+          "source_quote": "612.00"
+        },
+        "amount": {
+          "value": "22032.00",
+          "source_quote": "22,032.00"
+        }
+      }
+    ],
+    "subtotal": {
+      "value": "52458.75",
+      "source_quote": "52,458.75"
+    },
+    "tax_total": {
+      "value": "0.00",
+      "source_quote": "0.00"
+    },
+    "total": {
+      "value": "52458.75",
+      "source_quote": "52,458.75"
+    }
+  },
+  "usage": {
+    "model": "gpt-6.1-terra",
+    "input_tokens": 3645,
+    "output_tokens": 575,
+    "reasoning_tokens": 0,
+    "response_id": "resp_003142c4b10203f1016afd3e75644c87d09b3d0a9e6ff96ca7"
+  },
+  "cost_usd": "0.00652",
+  "latency_ms": 10330
+}

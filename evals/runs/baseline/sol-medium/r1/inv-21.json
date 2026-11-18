@@ -1,0 +1,172 @@
+{
+  "invoice_id": "inv-21",
+  "config": "sol-medium",
+  "model": "gpt-6.1-sol",
+  "effort": "medium",
+  "repeat": 1,
+  "outcome": "succeeded",
+  "error": null,
+  "invoice": {
+    "invoice_number": {
+      "value": "KA-2026-9957",
+      "source_quote": "KA-2026-9957"
+    },
+    "invoice_date": {
+      "value": "2026-09-28",
+      "source_quote": "28/09/2026"
+    },
+    "supplier_name": {
+      "value": "Kaveri Hydraulics Pvt Ltd",
+      "source_quote": "Kaveri Hydraulics Pvt Ltd"
+    },
+    "supplier_country": {
+      "value": "India",
+      "source_quote": "India"
+    },
+    "buyer_name": {
+      "value": "Western Offshore Energy Ltd",
+      "source_quote": "Western Offshore Energy Ltd"
+    },
+    "buyer_country": {
+      "value": "India",
+      "source_quote": "India"
+    },
+    "currency": {
+      "value": "USD",
+      "source_quote": "USD"
+    },
+    "line_items": [
+      {
+        "description": {
+          "value": "Valve stem packing set",
+          "source_quote": "Valve stem packing set"
+        },
+        "hs_code": {
+          "value": "84849000",
+          "source_quote": "84849000"
+        },
+        "quantity": {
+          "value": "10",
+          "source_quote": "10"
+        },
+        "unit_price": {
+          "value": "96.40",
+          "source_quote": "96,40"
+        },
+        "amount": {
+          "value": "964.00",
+          "source_quote": "964,00"
+        }
+      },
+      {
+        "description": {
+          "value": "Gate valve, 4 in, API 6A",
+          "source_quote": "Gate valve, 4 in, API 6A"
+        },
+        "hs_code": {
+          "value": "84818081",
+          "source_quote": "84818081"
+        },
+        "quantity": {
+          "value": "1",
+          "source_quote": "1"
+        },
+        "unit_price": {
+          "value": "2140.00",
+          "source_quote": "2.140,00"
+        },
+        "amount": {
+          "value": "2140.00",
+          "source_quote": "2.140,00"
+        }
+      },
+      {
+        "description": {
+          "value": "Drill pipe thread protector",
+          "source_quote": "Drill pipe thread protector"
+        },
+        "hs_code": {
+          "value": "73269099",
+          "source_quote": "7326 90 99"
+        },
+        "quantity": {
+          "value": "34",
+          "source_quote": "34"
+        },
+        "unit_price": {
+          "value": "18.75",
+          "source_quote": "18,75"
+        },
+        "amount": {
+          "value": "637.50",
+          "source_quote": "637,50"
+        }
+      },
+      {
+        "description": {
+          "value": "Hydraulic hose assembly, 2 in",
+          "source_quote": "Hydraulic hose assembly, 2 in"
+        },
+        "hs_code": {
+          "value": "40094200",
+          "source_quote": "4009.42.00"
+        },
+        "quantity": {
+          "value": "27",
+          "source_quote": "27"
+        },
+        "unit_price": {
+          "value": "145.00",
+          "source_quote": "145,00"
+        },
+        "amount": {
+          "value": "3915.00",
+          "source_quote": "3.915,00"
+        }
+      },
+      {
+        "description": {
+          "value": "Blowout preventer ram rubber",
+          "source_quote": "Blowout preventer ram rubber"
+        },
+        "hs_code": {
+          "value": "40169390",
+          "source_quote": "4016.93.90"
+        },
+        "quantity": {
+          "value": "12",
+          "source_quote": "12"
+        },
+        "unit_price": {
+          "value": "612.00",
+          "source_quote": "612,00"
+        },
+        "amount": {
+          "value": "7344.00",
+          "source_quote": "7.344,00"
+        }
+      }
+    ],
+    "subtotal": {
+      "value": "15000.50",
+      "source_quote": "15.000,50"
+    },
+    "tax_total": {
+      "value": "2700.09",
+      "source_quote": "2.700,09"
+    },
+    "total": {
+      "value": "17900.59",
+      "source_quote": "17.900,59"
+    }
+  },
+  "usage": {
+    "model": "gpt-6.1-sol",
+    "input_tokens": 1975,
+    "output_tokens": 1029,
+    "reasoning_tokens": 0,
+    "response_id": "resp_0a3342abb3e3cd0a016afd3f04ce1087d09a0c7d210c33fdf9"
+  },
+  "cost_usd": "0.01424",
+  "latency_ms": 11400
+}

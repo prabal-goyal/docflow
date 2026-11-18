@@ -1,0 +1,126 @@
+{
+  "id": "inv-15",
+  "split": "dev",
+  "issue": "missing_invoice_number",
+  "scanned": false,
+  "layout": "text",
+  "number_style": "en",
+  "date_style": "dmy_dot",
+  "fields": {
+    "invoice_number": {
+      "value": null,
+      "source_quote": null
+    },
+    "invoice_date": {
+      "value": "2026-02-24",
+      "source_quote": "24.02.2026"
+    },
+    "supplier_name": {
+      "value": "Northsea Valve Co. Ltd",
+      "source_quote": "Northsea Valve Co. Ltd"
+    },
+    "supplier_country": {
+      "value": "United Kingdom",
+      "source_quote": "United Kingdom"
+    },
+    "buyer_name": {
+      "value": "Gulf Drilling Services LLP",
+      "source_quote": "Gulf Drilling Services LLP"
+    },
+    "buyer_country": {
+      "value": "India",
+      "source_quote": "India"
+    },
+    "currency": {
+      "value": "GBP",
+      "source_quote": "GBP"
+    },
+    "line_items": [
+      {
+        "description": {
+          "value": "Centrifugal pump impeller",
+          "source_quote": "Centrifugal pump impeller"
+        },
+        "hs_code": {
+          "value": "84139100",
+          "source_quote": "8413 91 00"
+        },
+        "quantity": {
+          "value": "21",
+          "source_quote": "21"
+        },
+        "unit_price": {
+          "value": "1875.00",
+          "source_quote": "1,875.00"
+        },
+        "amount": {
+          "value": "39375.00",
+          "source_quote": "39,375.00"
+        }
+      },
+      {
+        "description": {
+          "value": "Tungsten carbide drill bit, 8.5 in",
+          "source_quote": "Tungsten carbide drill bit, 8.5 in"
+        },
+        "hs_code": {
+          "value": "82071910",
+          "source_quote": "8207 19 10"
+        },
+        "quantity": {
+          "value": "14",
+          "source_quote": "14"
+        },
+        "unit_price": {
+          "value": "1250.00",
+          "source_quote": "1,250.00"
+        },
+        "amount": {
+          "value": "17500.00",
+          "source_quote": "17,500.00"
+        }
+      },
+      {
+        "description": {
+          "value": "Pressure gauge, 10k psi",
+          "source_quote": "Pressure gauge, 10k psi"
+        },
+        "hs_code": {
+          "value": "90262040",
+          "source_quote": "90262040"
+        },
+        "quantity": {
+          "value": "30",
+          "source_quote": "30"
+        },
+        "unit_price": {
+          "value": "88.25",
+          "source_quote": "88.25"
+        },
+        "amount": {
+          "value": "2647.50",
+          "source_quote": "2,647.50"
+        }
+      }
+    ],
+    "subtotal": {
+      "value": "59522.50",
+      "source_quote": "59,522.50"
+    },
+    "tax_total": {
+      "value": "2976.12",
+      "source_quote": "2,976.12"
+    },
+    "total": {
+      "value": "62498.62",
+      "source_quote": "62,498.62"
+    }
+  },
+  "expected_flags": [
+    {
+      "field": "invoice_number",
+      "code": "missing_required"
+    }
+  ],
+  "unscored": []
+}

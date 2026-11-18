@@ -1,0 +1,128 @@
+{
+  "invoice_id": "inv-01",
+  "config": "sol-medium",
+  "model": "gpt-6.1-sol",
+  "effort": "medium",
+  "repeat": 2,
+  "outcome": "succeeded",
+  "error": null,
+  "invoice": {
+    "invoice_number": {
+      "value": "KA-2026-7043",
+      "source_quote": "KA-2026-7043"
+    },
+    "invoice_date": {
+      "value": "2026-09-15",
+      "source_quote": "15/09/2026"
+    },
+    "supplier_name": {
+      "value": "Kaveri Hydraulics Pvt Ltd",
+      "source_quote": "Kaveri Hydraulics Pvt Ltd"
+    },
+    "supplier_country": {
+      "value": "India",
+      "source_quote": "India"
+    },
+    "buyer_name": {
+      "value": "Western Offshore Energy Ltd",
+      "source_quote": "Western Offshore Energy Ltd"
+    },
+    "buyer_country": {
+      "value": "India",
+      "source_quote": "India"
+    },
+    "currency": {
+      "value": "USD",
+      "source_quote": "USD"
+    },
+    "line_items": [
+      {
+        "description": {
+          "value": "Mud pump piston seal kit",
+          "source_quote": "Mud pump piston seal kit"
+        },
+        "hs_code": {
+          "value": "84842000",
+          "source_quote": "84842000"
+        },
+        "quantity": {
+          "value": "19",
+          "source_quote": "19"
+        },
+        "unit_price": {
+          "value": "310.50",
+          "source_quote": "310,50"
+        },
+        "amount": {
+          "value": "5899.50",
+          "source_quote": "5 899,50"
+        }
+      },
+      {
+        "description": {
+          "value": "Blowout preventer ram rubber",
+          "source_quote": "Blowout preventer ram rubber"
+        },
+        "hs_code": {
+          "value": "40169390",
+          "source_quote": "4016 93 90"
+        },
+        "quantity": {
+          "value": "10",
+          "source_quote": "10"
+        },
+        "unit_price": {
+          "value": "612.00",
+          "source_quote": "612,00"
+        },
+        "amount": {
+          "value": "6166.00",
+          "source_quote": "6 166,00"
+        }
+      },
+      {
+        "description": {
+          "value": "Valve stem packing set",
+          "source_quote": "Valve stem packing set"
+        },
+        "hs_code": {
+          "value": "84849000",
+          "source_quote": "84849000"
+        },
+        "quantity": {
+          "value": "37",
+          "source_quote": "37"
+        },
+        "unit_price": {
+          "value": "96.40",
+          "source_quote": "96,40"
+        },
+        "amount": {
+          "value": "3566.80",
+          "source_quote": "3 566,80"
+        }
+      }
+    ],
+    "subtotal": {
+      "value": "15632.30",
+      "source_quote": "15 632,30"
+    },
+    "tax_total": {
+      "value": "781.62",
+      "source_quote": "781,62"
+    },
+    "total": {
+      "value": "16413.92",
+      "source_quote": "16 413,92"
+    }
+  },
+  "usage": {
+    "model": "gpt-6.1-sol",
+    "input_tokens": 1769,
+    "output_tokens": 459,
+    "reasoning_tokens": 0,
+    "response_id": "resp_0e0648297ec46f6e016afd3f1ac70c87d0ac0ba7fe60873a07"
+  },
+  "cost_usd": "0.008128",
+  "latency_ms": 8242
+}

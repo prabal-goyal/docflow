@@ -1,0 +1,185 @@
+{
+  "seed": 2026,
+  "invoices": [
+    {
+      "id": "inv-01",
+      "split": "test",
+      "issue": "line_mismatch",
+      "scanned": false
+    },
+    {
+      "id": "inv-02",
+      "split": "test",
+      "issue": "clean",
+      "scanned": false
+    },
+    {
+      "id": "inv-03",
+      "split": "test",
+      "issue": "clean",
+      "scanned": false
+    },
+    {
+      "id": "inv-04",
+      "split": "test",
+      "issue": "clean",
+      "scanned": false
+    },
+    {
+      "id": "inv-05",
+      "split": "test",
+      "issue": "clean",
+      "scanned": true
+    },
+    {
+      "id": "inv-06",
+      "split": "test",
+      "issue": "clean",
+      "scanned": false
+    },
+    {
+      "id": "inv-07",
+      "split": "dev",
+      "issue": "future_date",
+      "scanned": false
+    },
+    {
+      "id": "inv-08",
+      "split": "test",
+      "issue": "missing_buyer",
+      "scanned": false
+    },
+    {
+      "id": "inv-09",
+      "split": "dev",
+      "issue": "bad_hs",
+      "scanned": true
+    },
+    {
+      "id": "inv-10",
+      "split": "dev",
+      "issue": "clean",
+      "scanned": false
+    },
+    {
+      "id": "inv-11",
+      "split": "dev",
+      "issue": "clean",
+      "scanned": false
+    },
+    {
+      "id": "inv-12",
+      "split": "dev",
+      "issue": "clean",
+      "scanned": false
+    },
+    {
+      "id": "inv-13",
+      "split": "dev",
+      "issue": "clean",
+      "scanned": false
+    },
+    {
+      "id": "inv-14",
+      "split": "dev",
+      "issue": "clean",
+      "scanned": false
+    },
+    {
+      "id": "inv-15",
+      "split": "dev",
+      "issue": "missing_invoice_number",
+      "scanned": false
+    },
+    {
+      "id": "inv-16",
+      "split": "dev",
+      "issue": "line_mismatch",
+      "scanned": false
+    },
+    {
+      "id": "inv-17",
+      "split": "test",
+      "issue": "subtotal_mismatch",
+      "scanned": false
+    },
+    {
+      "id": "inv-18",
+      "split": "dev",
+      "issue": "clean",
+      "scanned": true
+    },
+    {
+      "id": "inv-19",
+      "split": "test",
+      "issue": "total_mismatch",
+      "scanned": false
+    },
+    {
+      "id": "inv-20",
+      "split": "dev",
+      "issue": "line_mismatch",
+      "scanned": false
+    },
+    {
+      "id": "inv-21",
+      "split": "dev",
+      "issue": "total_mismatch",
+      "scanned": false
+    },
+    {
+      "id": "inv-22",
+      "split": "dev",
+      "issue": "missing_buyer",
+      "scanned": false
+    },
+    {
+      "id": "inv-23",
+      "split": "test",
+      "issue": "bad_hs",
+      "scanned": false
+    },
+    {
+      "id": "inv-24",
+      "split": "dev",
+      "issue": "clean",
+      "scanned": false
+    },
+    {
+      "id": "inv-25",
+      "split": "dev",
+      "issue": "missing_buyer",
+      "scanned": true
+    },
+    {
+      "id": "inv-26",
+      "split": "dev",
+      "issue": "bad_hs",
+      "scanned": false
+    },
+    {
+      "id": "inv-27",
+      "split": "dev",
+      "issue": "line_mismatch",
+      "scanned": true
+    },
+    {
+      "id": "inv-28",
+      "split": "dev",
+      "issue": "subtotal_mismatch",
+      "scanned": false
+    },
+    {
+      "id": "inv-29",
+      "split": "dev",
+      "issue": "clean",
+      "scanned": false
+    },
+    {
+      "id": "inv-30",
+      "split": "dev",
+      "issue": "clean",
+      "scanned": false
+    }
+  ]
+}

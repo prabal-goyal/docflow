@@ -4,7 +4,7 @@ AI document intake and approval API. Upload a commercial invoice; an LLM extract
 deterministic checks flag anything suspicious, reviewers approve in stages with field-level queries,
 and the customer's system is notified through signed webhooks.
 
-Status: **M4 (webhooks)** done; evaluation (M5) next. See [docs/PLAN.md](docs/PLAN.md) for the full plan.
+Status: **M5 (evaluation)** done; AWS deployment (M6) next. See [docs/PLAN.md](docs/PLAN.md) for the full plan.
 
 ## Run with Docker
 
@@ -158,3 +158,18 @@ Admin endpoints: `POST/GET /webhooks`, `PATCH /webhooks/{id}`, `POST /webhooks/{
 
 For receivers: [docs/integration-guide.md](docs/integration-guide.md) (signature verification in
 Python and Node.js). Design: [docs/decisions/0005-webhooks.md](docs/decisions/0005-webhooks.md).
+
+## Evaluation
+
+30 synthetic invoices (20 dev / 10 held-out test, 5 scanned, 13 with planted problems) across four
+OpenAI configs, two repeats each. On the held-out set, the default `gpt-6-luna` reached 100% field
+accuracy and caught 100% of planted problems at about $0.0007 per invoice and ~10 s median latency,
+matching models 7-16x more expensive. Results, every miss, and the limitations (the dataset is too
+easy to separate the models): [evals/results.md](evals/results.md).
+
+```bash
+uv run python -m evals.dataset                              # regenerate the dataset (deterministic)
+uv run python -m evals.harness --run-id x --dry-run          # cost estimate before any paid run
+uv run python -m evals.harness --run-id x --configs luna-medium --repeats 1   # PAID
+uv run python -m evals.score evals/runs/x                    # free, re-scores saved outputs
+```

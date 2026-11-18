@@ -1,0 +1,150 @@
+{
+  "invoice_id": "inv-05",
+  "config": "terra-medium",
+  "model": "gpt-6.1-terra",
+  "effort": "medium",
+  "repeat": 1,
+  "outcome": "succeeded",
+  "error": null,
+  "invoice": {
+    "invoice_number": {
+      "value": "LY-2026-8392",
+      "source_quote": "LY-2026-8392"
+    },
+    "invoice_date": {
+      "value": "2026-08-18",
+      "source_quote": "2026-08-18"
+    },
+    "supplier_name": {
+      "value": "Lyon Forage SAS",
+      "source_quote": "Lyon Forage SAS"
+    },
+    "supplier_country": {
+      "value": "France",
+      "source_quote": "France"
+    },
+    "buyer_name": {
+      "value": "Krishna Basin Exploration Pvt Ltd",
+      "source_quote": "Krishna Basin Exploration Pvt Ltd"
+    },
+    "buyer_country": {
+      "value": "India",
+      "source_quote": "India"
+    },
+    "currency": {
+      "value": "EUR",
+      "source_quote": "EUR"
+    },
+    "line_items": [
+      {
+        "description": {
+          "value": "Centrifugal pump impeller",
+          "source_quote": "Centrifugal pump impeller"
+        },
+        "hs_code": {
+          "value": "84139100",
+          "source_quote": "8413.91.00"
+        },
+        "quantity": {
+          "value": "24",
+          "source_quote": "24"
+        },
+        "unit_price": {
+          "value": "1875.00",
+          "source_quote": "1,875.00"
+        },
+        "amount": {
+          "value": "45000.00",
+          "source_quote": "45,000.00"
+        }
+      },
+      {
+        "description": {
+          "value": "Mud pump piston seal kit",
+          "source_quote": "Mud pump piston seal kit"
+        },
+        "hs_code": {
+          "value": "84842000",
+          "source_quote": "8484 20 00"
+        },
+        "quantity": {
+          "value": "13",
+          "source_quote": "13"
+        },
+        "unit_price": {
+          "value": "310.50",
+          "source_quote": "310.50"
+        },
+        "amount": {
+          "value": "4036.50",
+          "source_quote": "4,036.50"
+        }
+      },
+      {
+        "description": {
+          "value": "Valve stem packing set",
+          "source_quote": "Valve stem packing set"
+        },
+        "hs_code": {
+          "value": "84849000",
+          "source_quote": "8484.90.00"
+        },
+        "quantity": {
+          "value": "27",
+          "source_quote": "27"
+        },
+        "unit_price": {
+          "value": "96.40",
+          "source_quote": "96.40"
+        },
+        "amount": {
+          "value": "2602.80",
+          "source_quote": "2,602.80"
+        }
+      },
+      {
+        "description": {
+          "value": "Gate valve, 4 in, API 6A",
+          "source_quote": "Gate valve, 4 in, API 6A"
+        },
+        "hs_code": {
+          "value": "84818081",
+          "source_quote": "8481.80.81"
+        },
+        "quantity": {
+          "value": "29",
+          "source_quote": "29"
+        },
+        "unit_price": {
+          "value": "2140.00",
+          "source_quote": "2,140.00"
+        },
+        "amount": {
+          "value": "62060.00",
+          "source_quote": "62,060.00"
+        }
+      }
+    ],
+    "subtotal": {
+      "value": "113699.30",
+      "source_quote": "113,699.30"
+    },
+    "tax_total": {
+      "value": "20465.87",
+      "source_quote": "20,465.87"
+    },
+    "total": {
+      "value": "134165.17",
+      "source_quote": "134,165.17"
+    }
+  },
+  "usage": {
+    "model": "gpt-6.1-terra",
+    "input_tokens": 3645,
+    "output_tokens": 652,
+    "reasoning_tokens": 78,
+    "response_id": "resp_04793483dbee13b7016afd3e5a01d887d0a482c3a2cd628d33"
+  },
+  "cost_usd": "0.006905",
+  "latency_ms": 10127
+}

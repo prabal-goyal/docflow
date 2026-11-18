@@ -1,0 +1,104 @@
+{
+  "id": "inv-28",
+  "split": "dev",
+  "issue": "subtotal_mismatch",
+  "scanned": false,
+  "layout": "text",
+  "number_style": "de",
+  "date_style": "iso",
+  "fields": {
+    "invoice_number": {
+      "value": "NO-2026-7544",
+      "source_quote": "NO-2026-7544"
+    },
+    "invoice_date": {
+      "value": "2026-04-23",
+      "source_quote": "2026-04-23"
+    },
+    "supplier_name": {
+      "value": "Northsea Valve Co. Ltd",
+      "source_quote": "Northsea Valve Co. Ltd"
+    },
+    "supplier_country": {
+      "value": "United Kingdom",
+      "source_quote": "United Kingdom"
+    },
+    "buyer_name": {
+      "value": "Krishna Basin Exploration Pvt Ltd",
+      "source_quote": "Krishna Basin Exploration Pvt Ltd"
+    },
+    "buyer_country": {
+      "value": "India",
+      "source_quote": "India"
+    },
+    "currency": {
+      "value": "GBP",
+      "source_quote": "GBP"
+    },
+    "line_items": [
+      {
+        "description": {
+          "value": "Blowout preventer ram rubber",
+          "source_quote": "Blowout preventer ram rubber"
+        },
+        "hs_code": {
+          "value": "40169390",
+          "source_quote": "40169390"
+        },
+        "quantity": {
+          "value": "18",
+          "source_quote": "18"
+        },
+        "unit_price": {
+          "value": "612.00",
+          "source_quote": "612,00"
+        },
+        "amount": {
+          "value": "11016.00",
+          "source_quote": "11.016,00"
+        }
+      },
+      {
+        "description": {
+          "value": "Mud pump piston seal kit",
+          "source_quote": "Mud pump piston seal kit"
+        },
+        "hs_code": {
+          "value": "84842000",
+          "source_quote": "84842000"
+        },
+        "quantity": {
+          "value": "37",
+          "source_quote": "37"
+        },
+        "unit_price": {
+          "value": "310.50",
+          "source_quote": "310,50"
+        },
+        "amount": {
+          "value": "11488.50",
+          "source_quote": "11.488,50"
+        }
+      }
+    ],
+    "subtotal": {
+      "value": "22554.50",
+      "source_quote": "22.554,50"
+    },
+    "tax_total": {
+      "value": "4059.81",
+      "source_quote": "4.059,81"
+    },
+    "total": {
+      "value": "26614.31",
+      "source_quote": "26.614,31"
+    }
+  },
+  "expected_flags": [
+    {
+      "field": "subtotal",
+      "code": "arithmetic_mismatch"
+    }
+  ],
+  "unscored": []
+}

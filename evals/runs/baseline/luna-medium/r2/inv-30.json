@@ -1,0 +1,128 @@
+{
+  "invoice_id": "inv-30",
+  "config": "luna-medium",
+  "model": "gpt-6-luna",
+  "effort": "medium",
+  "repeat": 2,
+  "outcome": "succeeded",
+  "error": null,
+  "invoice": {
+    "invoice_number": {
+      "value": "NO-2026-5536",
+      "source_quote": "NO-2026-5536"
+    },
+    "invoice_date": {
+      "value": "2026-08-28",
+      "source_quote": "28/08/2026"
+    },
+    "supplier_name": {
+      "value": "Northsea Valve Co. Ltd",
+      "source_quote": "Northsea Valve Co. Ltd"
+    },
+    "supplier_country": {
+      "value": "United Kingdom",
+      "source_quote": "United Kingdom"
+    },
+    "buyer_name": {
+      "value": "Western Offshore Energy Ltd",
+      "source_quote": "Western Offshore Energy Ltd"
+    },
+    "buyer_country": {
+      "value": "India",
+      "source_quote": "India"
+    },
+    "currency": {
+      "value": "GBP",
+      "source_quote": "GBP"
+    },
+    "line_items": [
+      {
+        "description": {
+          "value": "Tungsten carbide drill bit, 8.5 in",
+          "source_quote": "Tungsten carbide drill bit, 8.5 in"
+        },
+        "hs_code": {
+          "value": "82071910",
+          "source_quote": "8207 19 10"
+        },
+        "quantity": {
+          "value": "8",
+          "source_quote": "8"
+        },
+        "unit_price": {
+          "value": "1250.00",
+          "source_quote": "1 250,00"
+        },
+        "amount": {
+          "value": "10000.00",
+          "source_quote": "10 000,00"
+        }
+      },
+      {
+        "description": {
+          "value": "Stainless steel flange, 6 in",
+          "source_quote": "Stainless steel flange, 6 in"
+        },
+        "hs_code": {
+          "value": "73079100",
+          "source_quote": "73079100"
+        },
+        "quantity": {
+          "value": "18",
+          "source_quote": "18"
+        },
+        "unit_price": {
+          "value": "230.80",
+          "source_quote": "230,80"
+        },
+        "amount": {
+          "value": "4154.40",
+          "source_quote": "4 154,40"
+        }
+      },
+      {
+        "description": {
+          "value": "Gate valve, 4 in, API 6A",
+          "source_quote": "Gate valve, 4 in, API 6A"
+        },
+        "hs_code": {
+          "value": "84818081",
+          "source_quote": "8481.80.81"
+        },
+        "quantity": {
+          "value": "2",
+          "source_quote": "2"
+        },
+        "unit_price": {
+          "value": "2140.00",
+          "source_quote": "2 140,00"
+        },
+        "amount": {
+          "value": "4280.00",
+          "source_quote": "4 280,00"
+        }
+      }
+    ],
+    "subtotal": {
+      "value": "18434.40",
+      "source_quote": "18 434,40"
+    },
+    "tax_total": {
+      "value": "3318.19",
+      "source_quote": "3 318,19"
+    },
+    "total": {
+      "value": "21752.59",
+      "source_quote": "21 752,59"
+    }
+  },
+  "usage": {
+    "model": "gpt-6-luna",
+    "input_tokens": 1800,
+    "output_tokens": 944,
+    "reasoning_tokens": 175,
+    "response_id": "resp_0d5cee439df41857016afd3dc5350087d0a9042dfdf54330c3"
+  },
+  "cost_usd": "0.000652",
+  "latency_ms": 8838
+}

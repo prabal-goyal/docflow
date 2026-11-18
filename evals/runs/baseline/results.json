@@ -1,0 +1,976 @@
+{
+  "run": "baseline",
+  "results": {
+    "luna-low": {
+      "dev": {
+        "invoices": 40,
+        "failures": 0,
+        "field_accuracy": 1.0,
+        "invoices_fully_correct": 1.0,
+        "field_accuracy_by_repeat": {
+          "1": 1.0,
+          "2": 1.0
+        },
+        "per_field_accuracy": {
+          "amount": 1.0,
+          "buyer_country": 1.0,
+          "buyer_name": 1.0,
+          "currency": 1.0,
+          "description": 1.0,
+          "hs_code": 1.0,
+          "invoice_date": 1.0,
+          "invoice_number": 1.0,
+          "quantity": 1.0,
+          "subtotal": 1.0,
+          "supplier_country": 1.0,
+          "supplier_name": 1.0,
+          "tax_total": 1.0,
+          "total": 1.0,
+          "unit_price": 1.0
+        },
+        "problem_recall": 0.9545454545454546,
+        "problem_precision": 1.0,
+        "flag_precision": 1.0,
+        "flag_recall": 0.9666666666666667,
+        "per_code": {
+          "arithmetic_mismatch": {
+            "tp": 10,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0
+          },
+          "grounding_unverifiable": {
+            "tp": 8,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0
+          },
+          "invalid_format": {
+            "tp": 5,
+            "fp": 0,
+            "fn": 1,
+            "precision": 1.0,
+            "recall": 0.8333333333333334
+          },
+          "missing_required": {
+            "tp": 6,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0
+          }
+        },
+        "false_flags_per_clean_invoice": 0.0,
+        "ungrounded_on_clean_text": 0,
+        "extra_lines": 0,
+        "cost_total_usd": "0.0239980",
+        "cost_per_invoice_usd": "0.000600",
+        "latency_p50_ms": 9455,
+        "latency_p95_ms": 11715,
+        "mean_input_tokens": 1772.0,
+        "mean_output_tokens": 845.5,
+        "mean_reasoning_tokens": 95.2
+      },
+      "test": {
+        "invoices": 20,
+        "failures": 0,
+        "field_accuracy": 1.0,
+        "invoices_fully_correct": 1.0,
+        "field_accuracy_by_repeat": {
+          "1": 1.0,
+          "2": 1.0
+        },
+        "per_field_accuracy": {
+          "amount": 1.0,
+          "buyer_country": 1.0,
+          "buyer_name": 1.0,
+          "currency": 1.0,
+          "description": 1.0,
+          "hs_code": 1.0,
+          "invoice_date": 1.0,
+          "invoice_number": 1.0,
+          "quantity": 1.0,
+          "subtotal": 1.0,
+          "supplier_country": 1.0,
+          "supplier_name": 1.0,
+          "tax_total": 1.0,
+          "total": 1.0,
+          "unit_price": 1.0
+        },
+        "problem_recall": 1.0,
+        "problem_precision": 0.8333333333333334,
+        "flag_precision": 0.8571428571428571,
+        "flag_recall": 1.0,
+        "per_code": {
+          "arithmetic_mismatch": {
+            "tp": 6,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0
+          },
+          "grounding_unverifiable": {
+            "tp": 2,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0
+          },
+          "invalid_format": {
+            "tp": 2,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0
+          },
+          "missing_required": {
+            "tp": 2,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0
+          },
+          "not_grounded": {
+            "tp": 0,
+            "fp": 2,
+            "fn": 0,
+            "precision": 0.0,
+            "recall": null
+          }
+        },
+        "false_flags_per_clean_invoice": 0.0,
+        "ungrounded_on_clean_text": 0,
+        "extra_lines": 0,
+        "cost_total_usd": "0.0130245",
+        "cost_per_invoice_usd": "0.000651",
+        "latency_p50_ms": 9566,
+        "latency_p95_ms": 11393,
+        "mean_input_tokens": 1619.5,
+        "mean_output_tokens": 978.55,
+        "mean_reasoning_tokens": 98.3
+      },
+      "all": {
+        "invoices": 60,
+        "failures": 0,
+        "field_accuracy": 1.0,
+        "invoices_fully_correct": 1.0,
+        "field_accuracy_by_repeat": {
+          "1": 1.0,
+          "2": 1.0
+        },
+        "per_field_accuracy": {
+          "amount": 1.0,
+          "buyer_country": 1.0,
+          "buyer_name": 1.0,
+          "currency": 1.0,
+          "description": 1.0,
+          "hs_code": 1.0,
+          "invoice_date": 1.0,
+          "invoice_number": 1.0,
+          "quantity": 1.0,
+          "subtotal": 1.0,
+          "supplier_country": 1.0,
+          "supplier_name": 1.0,
+          "tax_total": 1.0,
+          "total": 1.0,
+          "unit_price": 1.0
+        },
+        "problem_recall": 0.96875,
+        "problem_precision": 0.9393939393939394,
+        "flag_precision": 0.9534883720930233,
+        "flag_recall": 0.9761904761904762,
+        "per_code": {
+          "arithmetic_mismatch": {
+            "tp": 16,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0
+          },
+          "grounding_unverifiable": {
+            "tp": 10,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0
+          },
+          "invalid_format": {
+            "tp": 7,
+            "fp": 0,
+            "fn": 1,
+            "precision": 1.0,
+            "recall": 0.875
+          },
+          "missing_required": {
+            "tp": 8,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0
+          },
+          "not_grounded": {
+            "tp": 0,
+            "fp": 2,
+            "fn": 0,
+            "precision": 0.0,
+            "recall": null
+          }
+        },
+        "false_flags_per_clean_invoice": 0.0,
+        "ungrounded_on_clean_text": 0,
+        "extra_lines": 0,
+        "cost_total_usd": "0.0370225",
+        "cost_per_invoice_usd": "0.000617",
+        "latency_p50_ms": 9492,
+        "latency_p95_ms": 11556,
+        "mean_input_tokens": 1721.1666666666667,
+        "mean_output_tokens": 889.85,
+        "mean_reasoning_tokens": 96.23333333333333
+      }
+    },
+    "luna-medium": {
+      "dev": {
+        "invoices": 40,
+        "failures": 0,
+        "field_accuracy": 1.0,
+        "invoices_fully_correct": 1.0,
+        "field_accuracy_by_repeat": {
+          "1": 1.0,
+          "2": 1.0
+        },
+        "per_field_accuracy": {
+          "amount": 1.0,
+          "buyer_country": 1.0,
+          "buyer_name": 1.0,
+          "currency": 1.0,
+          "description": 1.0,
+          "hs_code": 1.0,
+          "invoice_date": 1.0,
+          "invoice_number": 1.0,
+          "quantity": 1.0,
+          "subtotal": 1.0,
+          "supplier_country": 1.0,
+          "supplier_name": 1.0,
+          "tax_total": 1.0,
+          "total": 1.0,
+          "unit_price": 1.0
+        },
+        "problem_recall": 1.0,
+        "problem_precision": 1.0,
+        "flag_precision": 1.0,
+        "flag_recall": 1.0,
+        "per_code": {
+          "arithmetic_mismatch": {
+            "tp": 10,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0
+          },
+          "grounding_unverifiable": {
+            "tp": 8,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0
+          },
+          "invalid_format": {
+            "tp": 6,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0
+          },
+          "missing_required": {
+            "tp": 6,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0
+          }
+        },
+        "false_flags_per_clean_invoice": 0.0,
+        "ungrounded_on_clean_text": 0,
+        "extra_lines": 0,
+        "cost_total_usd": "0.0267945",
+        "cost_per_invoice_usd": "0.000670",
+        "latency_p50_ms": 9667,
+        "latency_p95_ms": 14084,
+        "mean_input_tokens": 1772.0,
+        "mean_output_tokens": 985.325,
+        "mean_reasoning_tokens": 220.35
+      },
+      "test": {
+        "invoices": 20,
+        "failures": 0,
+        "field_accuracy": 1.0,
+        "invoices_fully_correct": 1.0,
+        "field_accuracy_by_repeat": {
+          "1": 1.0,
+          "2": 1.0
+        },
+        "per_field_accuracy": {
+          "amount": 1.0,
+          "buyer_country": 1.0,
+          "buyer_name": 1.0,
+          "currency": 1.0,
+          "description": 1.0,
+          "hs_code": 1.0,
+          "invoice_date": 1.0,
+          "invoice_number": 1.0,
+          "quantity": 1.0,
+          "subtotal": 1.0,
+          "supplier_country": 1.0,
+          "supplier_name": 1.0,
+          "tax_total": 1.0,
+          "total": 1.0,
+          "unit_price": 1.0
+        },
+        "problem_recall": 1.0,
+        "problem_precision": 0.9090909090909091,
+        "flag_precision": 0.9230769230769231,
+        "flag_recall": 1.0,
+        "per_code": {
+          "arithmetic_mismatch": {
+            "tp": 6,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0
+          },
+          "grounding_unverifiable": {
+            "tp": 2,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0
+          },
+          "invalid_format": {
+            "tp": 2,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0
+          },
+          "missing_required": {
+            "tp": 2,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0
+          },
+          "not_grounded": {
+            "tp": 0,
+            "fp": 1,
+            "fn": 0,
+            "precision": 0.0,
+            "recall": null
+          }
+        },
+        "false_flags_per_clean_invoice": 0.0,
+        "ungrounded_on_clean_text": 0,
+        "extra_lines": 0,
+        "cost_total_usd": "0.0139495",
+        "cost_per_invoice_usd": "0.000697",
+        "latency_p50_ms": 10124,
+        "latency_p95_ms": 11869,
+        "mean_input_tokens": 1619.5,
+        "mean_output_tokens": 1071.05,
+        "mean_reasoning_tokens": 203.95
+      },
+      "all": {
+        "invoices": 60,
+        "failures": 0,
+        "field_accuracy": 1.0,
+        "invoices_fully_correct": 1.0,
+        "field_accuracy_by_repeat": {
+          "1": 1.0,
+          "2": 1.0
+        },
+        "per_field_accuracy": {
+          "amount": 1.0,
+          "buyer_country": 1.0,
+          "buyer_name": 1.0,
+          "currency": 1.0,
+          "description": 1.0,
+          "hs_code": 1.0,
+          "invoice_date": 1.0,
+          "invoice_number": 1.0,
+          "quantity": 1.0,
+          "subtotal": 1.0,
+          "supplier_country": 1.0,
+          "supplier_name": 1.0,
+          "tax_total": 1.0,
+          "total": 1.0,
+          "unit_price": 1.0
+        },
+        "problem_recall": 1.0,
+        "problem_precision": 0.9696969696969697,
+        "flag_precision": 0.9767441860465116,
+        "flag_recall": 1.0,
+        "per_code": {
+          "arithmetic_mismatch": {
+            "tp": 16,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0
+          },
+          "grounding_unverifiable": {
+            "tp": 10,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0
+          },
+          "invalid_format": {
+            "tp": 8,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0
+          },
+          "missing_required": {
+            "tp": 8,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0
+          },
+          "not_grounded": {
+            "tp": 0,
+            "fp": 1,
+            "fn": 0,
+            "precision": 0.0,
+            "recall": null
+          }
+        },
+        "false_flags_per_clean_invoice": 0.0,
+        "ungrounded_on_clean_text": 0,
+        "extra_lines": 0,
+        "cost_total_usd": "0.0407440",
+        "cost_per_invoice_usd": "0.000679",
+        "latency_p50_ms": 9793,
+        "latency_p95_ms": 13927,
+        "mean_input_tokens": 1721.1666666666667,
+        "mean_output_tokens": 1013.9,
+        "mean_reasoning_tokens": 214.88333333333333
+      }
+    },
+    "sol-medium": {
+      "dev": {
+        "invoices": 40,
+        "failures": 0,
+        "field_accuracy": 1.0,
+        "invoices_fully_correct": 1.0,
+        "field_accuracy_by_repeat": {
+          "1": 1.0,
+          "2": 1.0
+        },
+        "per_field_accuracy": {
+          "amount": 1.0,
+          "buyer_country": 1.0,
+          "buyer_name": 1.0,
+          "currency": 1.0,
+          "description": 1.0,
+          "hs_code": 1.0,
+          "invoice_date": 1.0,
+          "invoice_number": 1.0,
+          "quantity": 1.0,
+          "subtotal": 1.0,
+          "supplier_country": 1.0,
+          "supplier_name": 1.0,
+          "tax_total": 1.0,
+          "total": 1.0,
+          "unit_price": 1.0
+        },
+        "problem_recall": 1.0,
+        "problem_precision": 1.0,
+        "flag_precision": 1.0,
+        "flag_recall": 1.0,
+        "per_code": {
+          "arithmetic_mismatch": {
+            "tp": 10,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0
+          },
+          "grounding_unverifiable": {
+            "tp": 8,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0
+          },
+          "invalid_format": {
+            "tp": 6,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0
+          },
+          "missing_required": {
+            "tp": 6,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0
+          }
+        },
+        "false_flags_per_clean_invoice": 0.0,
+        "ungrounded_on_clean_text": 0,
+        "extra_lines": 0,
+        "cost_total_usd": "0.431700",
+        "cost_per_invoice_usd": "0.010792",
+        "latency_p50_ms": 9294,
+        "latency_p95_ms": 12301,
+        "mean_input_tokens": 1772.0,
+        "mean_output_tokens": 724.85,
+        "mean_reasoning_tokens": 9.775
+      },
+      "test": {
+        "invoices": 20,
+        "failures": 0,
+        "field_accuracy": 1.0,
+        "invoices_fully_correct": 1.0,
+        "field_accuracy_by_repeat": {
+          "1": 1.0,
+          "2": 1.0
+        },
+        "per_field_accuracy": {
+          "amount": 1.0,
+          "buyer_country": 1.0,
+          "buyer_name": 1.0,
+          "currency": 1.0,
+          "description": 1.0,
+          "hs_code": 1.0,
+          "invoice_date": 1.0,
+          "invoice_number": 1.0,
+          "quantity": 1.0,
+          "subtotal": 1.0,
+          "supplier_country": 1.0,
+          "supplier_name": 1.0,
+          "tax_total": 1.0,
+          "total": 1.0,
+          "unit_price": 1.0
+        },
+        "problem_recall": 1.0,
+        "problem_precision": 1.0,
+        "flag_precision": 1.0,
+        "flag_recall": 1.0,
+        "per_code": {
+          "arithmetic_mismatch": {
+            "tp": 6,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0
+          },
+          "grounding_unverifiable": {
+            "tp": 2,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0
+          },
+          "invalid_format": {
+            "tp": 2,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0
+          },
+          "missing_required": {
+            "tp": 2,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0
+          }
+        },
+        "false_flags_per_clean_invoice": 0.0,
+        "ungrounded_on_clean_text": 0,
+        "extra_lines": 0,
+        "cost_total_usd": "0.223340",
+        "cost_per_invoice_usd": "0.011167",
+        "latency_p50_ms": 9211,
+        "latency_p95_ms": 10811,
+        "mean_input_tokens": 1619.5,
+        "mean_output_tokens": 792.8,
+        "mean_reasoning_tokens": 8.7
+      },
+      "all": {
+        "invoices": 60,
+        "failures": 0,
+        "field_accuracy": 1.0,
+        "invoices_fully_correct": 1.0,
+        "field_accuracy_by_repeat": {
+          "1": 1.0,
+          "2": 1.0
+        },
+        "per_field_accuracy": {
+          "amount": 1.0,
+          "buyer_country": 1.0,
+          "buyer_name": 1.0,
+          "currency": 1.0,
+          "description": 1.0,
+          "hs_code": 1.0,
+          "invoice_date": 1.0,
+          "invoice_number": 1.0,
+          "quantity": 1.0,
+          "subtotal": 1.0,
+          "supplier_country": 1.0,
+          "supplier_name": 1.0,
+          "tax_total": 1.0,
+          "total": 1.0,
+          "unit_price": 1.0
+        },
+        "problem_recall": 1.0,
+        "problem_precision": 1.0,
+        "flag_precision": 1.0,
+        "flag_recall": 1.0,
+        "per_code": {
+          "arithmetic_mismatch": {
+            "tp": 16,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0
+          },
+          "grounding_unverifiable": {
+            "tp": 10,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0
+          },
+          "invalid_format": {
+            "tp": 8,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0
+          },
+          "missing_required": {
+            "tp": 8,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0
+          }
+        },
+        "false_flags_per_clean_invoice": 0.0,
+        "ungrounded_on_clean_text": 0,
+        "extra_lines": 0,
+        "cost_total_usd": "0.655040",
+        "cost_per_invoice_usd": "0.010917",
+        "latency_p50_ms": 9211,
+        "latency_p95_ms": 11744,
+        "mean_input_tokens": 1721.1666666666667,
+        "mean_output_tokens": 747.5,
+        "mean_reasoning_tokens": 9.416666666666666
+      }
+    },
+    "terra-medium": {
+      "dev": {
+        "invoices": 40,
+        "failures": 0,
+        "field_accuracy": 0.9990253411306043,
+        "invoices_fully_correct": 0.975,
+        "field_accuracy_by_repeat": {
+          "1": 1.0,
+          "2": 0.9980506822612085
+        },
+        "per_field_accuracy": {
+          "amount": 1.0,
+          "buyer_country": 1.0,
+          "buyer_name": 1.0,
+          "currency": 1.0,
+          "description": 1.0,
+          "hs_code": 0.9918032786885246,
+          "invoice_date": 1.0,
+          "invoice_number": 1.0,
+          "quantity": 1.0,
+          "subtotal": 1.0,
+          "supplier_country": 1.0,
+          "supplier_name": 1.0,
+          "tax_total": 1.0,
+          "total": 1.0,
+          "unit_price": 1.0
+        },
+        "problem_recall": 1.0,
+        "problem_precision": 1.0,
+        "flag_precision": 1.0,
+        "flag_recall": 1.0,
+        "per_code": {
+          "arithmetic_mismatch": {
+            "tp": 10,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0
+          },
+          "grounding_unverifiable": {
+            "tp": 8,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0
+          },
+          "invalid_format": {
+            "tp": 6,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0
+          },
+          "missing_required": {
+            "tp": 6,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0
+          }
+        },
+        "false_flags_per_clean_invoice": 0.0,
+        "ungrounded_on_clean_text": 0,
+        "extra_lines": 0,
+        "cost_total_usd": "0.181645",
+        "cost_per_invoice_usd": "0.004541",
+        "latency_p50_ms": 9086,
+        "latency_p95_ms": 11211,
+        "mean_input_tokens": 1772.0,
+        "mean_output_tokens": 553.825,
+        "mean_reasoning_tokens": 24.175
+      },
+      "test": {
+        "invoices": 20,
+        "failures": 0,
+        "field_accuracy": 1.0,
+        "invoices_fully_correct": 1.0,
+        "field_accuracy_by_repeat": {
+          "1": 1.0,
+          "2": 1.0
+        },
+        "per_field_accuracy": {
+          "amount": 1.0,
+          "buyer_country": 1.0,
+          "buyer_name": 1.0,
+          "currency": 1.0,
+          "description": 1.0,
+          "hs_code": 1.0,
+          "invoice_date": 1.0,
+          "invoice_number": 1.0,
+          "quantity": 1.0,
+          "subtotal": 1.0,
+          "supplier_country": 1.0,
+          "supplier_name": 1.0,
+          "tax_total": 1.0,
+          "total": 1.0,
+          "unit_price": 1.0
+        },
+        "problem_recall": 1.0,
+        "problem_precision": 1.0,
+        "flag_precision": 1.0,
+        "flag_recall": 1.0,
+        "per_code": {
+          "arithmetic_mismatch": {
+            "tp": 6,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0
+          },
+          "grounding_unverifiable": {
+            "tp": 2,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0
+          },
+          "invalid_format": {
+            "tp": 2,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0
+          },
+          "missing_required": {
+            "tp": 2,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0
+          }
+        },
+        "false_flags_per_clean_invoice": 0.0,
+        "ungrounded_on_clean_text": 0,
+        "extra_lines": 0,
+        "cost_total_usd": "0.094830",
+        "cost_per_invoice_usd": "0.004742",
+        "latency_p50_ms": 9660,
+        "latency_p95_ms": 11901,
+        "mean_input_tokens": 1619.5,
+        "mean_output_tokens": 624.4,
+        "mean_reasoning_tokens": 36.0
+      },
+      "all": {
+        "invoices": 60,
+        "failures": 0,
+        "field_accuracy": 0.9993804213135068,
+        "invoices_fully_correct": 0.9833333333333333,
+        "field_accuracy_by_repeat": {
+          "1": 1.0,
+          "2": 0.9987608426270136
+        },
+        "per_field_accuracy": {
+          "amount": 1.0,
+          "buyer_country": 1.0,
+          "buyer_name": 1.0,
+          "currency": 1.0,
+          "description": 1.0,
+          "hs_code": 0.9949494949494949,
+          "invoice_date": 1.0,
+          "invoice_number": 1.0,
+          "quantity": 1.0,
+          "subtotal": 1.0,
+          "supplier_country": 1.0,
+          "supplier_name": 1.0,
+          "tax_total": 1.0,
+          "total": 1.0,
+          "unit_price": 1.0
+        },
+        "problem_recall": 1.0,
+        "problem_precision": 1.0,
+        "flag_precision": 1.0,
+        "flag_recall": 1.0,
+        "per_code": {
+          "arithmetic_mismatch": {
+            "tp": 16,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0
+          },
+          "grounding_unverifiable": {
+            "tp": 10,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0
+          },
+          "invalid_format": {
+            "tp": 8,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0
+          },
+          "missing_required": {
+            "tp": 8,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0
+          }
+        },
+        "false_flags_per_clean_invoice": 0.0,
+        "ungrounded_on_clean_text": 0,
+        "extra_lines": 0,
+        "cost_total_usd": "0.276475",
+        "cost_per_invoice_usd": "0.004608",
+        "latency_p50_ms": 9124,
+        "latency_p95_ms": 11901,
+        "mean_input_tokens": 1721.1666666666667,
+        "mean_output_tokens": 577.35,
+        "mean_reasoning_tokens": 28.116666666666667
+      }
+    }
+  },
+  "misses": [
+    {
+      "config": "luna-low",
+      "repeat": "1",
+      "invoice": "inv-01",
+      "split": "test",
+      "issue": "line_mismatch",
+      "outcome": "succeeded",
+      "missed_flags": [],
+      "false_flags": [
+        [
+          "subtotal",
+          "not_grounded"
+        ]
+      ],
+      "wrong_fields": []
+    },
+    {
+      "config": "luna-low",
+      "repeat": "2",
+      "invoice": "inv-01",
+      "split": "test",
+      "issue": "line_mismatch",
+      "outcome": "succeeded",
+      "missed_flags": [],
+      "false_flags": [
+        [
+          "subtotal",
+          "not_grounded"
+        ]
+      ],
+      "wrong_fields": []
+    },
+    {
+      "config": "luna-low",
+      "repeat": "2",
+      "invoice": "inv-09",
+      "split": "dev",
+      "issue": "bad_hs (scanned)",
+      "outcome": "succeeded",
+      "missed_flags": [
+        [
+          "line_items[3].hs_code",
+          "invalid_format"
+        ]
+      ],
+      "false_flags": [],
+      "wrong_fields": []
+    },
+    {
+      "config": "luna-medium",
+      "repeat": "2",
+      "invoice": "inv-01",
+      "split": "test",
+      "issue": "line_mismatch",
+      "outcome": "succeeded",
+      "missed_flags": [],
+      "false_flags": [
+        [
+          "subtotal",
+          "not_grounded"
+        ]
+      ],
+      "wrong_fields": []
+    },
+    {
+      "config": "terra-medium",
+      "repeat": "2",
+      "invoice": "inv-18",
+      "split": "dev",
+      "issue": "clean (scanned)",
+      "outcome": "succeeded",
+      "missed_flags": [],
+      "false_flags": [],
+      "wrong_fields": [
+        [
+          "line_items[1].hs_code",
+          "90262040",
+          "90268040"
+        ]
+      ]
+    }
+  ]
+}
