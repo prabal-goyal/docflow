@@ -3,15 +3,36 @@ import logging
 import uuid
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Header, HTTPException, Response, UploadFile, status
-from sqlalchemy import select
+from fastapi import APIRouter, Depends, Header, HTTPException, Query, Response, UploadFile, status
+from sqlalchemy import ColumnElement, false, select
 from sqlalchemy.exc import IntegrityError
 
+from docflow import review
+from docflow.audit import AuditAction, record_event
+from docflow.config import Settings
 from docflow.deps import AppSettings, CurrentUser, DbSession, require_roles
+from docflow.errors import NotFoundError
 from docflow.jobs import EnqueueExtraction, get_enqueue
-from docflow.models import Document, ExtractionAttempt, Role, Submission, User
+from docflow.models import (
+    AuditEvent,
+    Document,
+    ExtractionAttempt,
+    Role,
+    Submission,
+    SubmissionStatus,
+    User,
+)
 from docflow.pdf import looks_like_pdf
-from docflow.schemas import ExtractionAttemptOut, SubmissionOut
+from docflow.schemas import (
+    AnswerQueriesRequest,
+    AuditEventOut,
+    DecisionRequest,
+    EditFieldsRequest,
+    ExtractionAttemptOut,
+    RaiseQueriesRequest,
+    SubmissionOut,
+    SubmissionSummary,
+)
 from docflow.storage import ObjectStorage, StorageError, get_storage
 
 router = APIRouter(prefix="/submissions", tags=["submissions"])
@@ -21,7 +42,10 @@ Uploader = Annotated[User, Depends(require_roles(Role.SUBMITTER, Role.ADMIN))]
 Storage = Annotated[ObjectStorage, Depends(get_storage)]
 Enqueue = Annotated[EnqueueExtraction, Depends(get_enqueue)]
 
+AdminUser = Annotated[User, Depends(require_roles(Role.ADMIN))]
+
 READ_CHUNK_BYTES = 64 * 1024
+MAX_PAGE_SIZE = 200
 
 
 def read_limited(upload: UploadFile, max_bytes: int) -> bytes:
@@ -113,6 +137,13 @@ def create_submission(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail="File storage is unavailable, please retry",
         ) from None
+    record_event(
+        db,
+        submission.id,
+        AuditAction.UPLOADED,
+        actor_id=user.id,
+        details={"sha256": sha256, "size_bytes": len(data)},
+    )
     db.commit()
 
     # Enqueue only after the commit, so the worker can never look for a row that is not there yet.
@@ -126,20 +157,149 @@ def create_submission(
     return SubmissionOut.model_validate(submission)
 
 
-@router.get("/{submission_id}")
-def get_submission(submission_id: uuid.UUID, db: DbSession, user: CurrentUser) -> SubmissionOut:
+def visible_submission(db: DbSession, submission_id: uuid.UUID, user: User) -> Submission:
     submission = db.get(Submission, submission_id)
     # Submitters only see their own. A 404 (not 403) avoids confirming that other IDs exist.
     if submission is None or (user.role == Role.SUBMITTER and submission.submitter_id != user.id):
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Submission not found")
+        raise NotFoundError("Submission not found")
+    return submission
+
+
+def awaiting(user: User, settings: Settings) -> ColumnElement[bool]:
+    """What this user can act on right now."""
+    if user.role == Role.SUBMITTER:
+        return Submission.status == SubmissionStatus.QUERY_RAISED
+    if user.role == Role.ADMIN:
+        return Submission.status == SubmissionStatus.EXTRACTION_FAILED
+    if user.role not in settings.approval_stages:
+        return false()
+    stage = settings.approval_stages.index(user.role) + 1
+    return (Submission.status == SubmissionStatus.IN_REVIEW) & (Submission.stage == stage)
+
+
+@router.get("")
+def list_submissions(
+    db: DbSession,
+    user: CurrentUser,
+    settings: AppSettings,
+    status_filter: Annotated[SubmissionStatus | None, Query(alias="status")] = None,
+    stage: Annotated[int | None, Query(ge=1)] = None,
+    awaiting_me: bool = False,
+    limit: Annotated[int, Query(ge=1, le=MAX_PAGE_SIZE)] = 50,
+    offset: Annotated[int, Query(ge=0)] = 0,
+) -> list[SubmissionSummary]:
+    """Newest first. Submitters see only their own submissions."""
+    query = select(Submission)
+    if user.role == Role.SUBMITTER:
+        query = query.where(Submission.submitter_id == user.id)
+    if status_filter is not None:
+        query = query.where(Submission.status == status_filter)
+    if stage is not None:
+        query = query.where(Submission.stage == stage)
+    if awaiting_me:
+        query = query.where(awaiting(user, settings))
+    query = query.order_by(Submission.created_at.desc(), Submission.id).limit(limit).offset(offset)
+    return [
+        SubmissionSummary(
+            id=s.id,
+            submitter_id=s.submitter_id,
+            status=s.status,
+            stage=s.stage,
+            flag_count=len(s.flags or []),
+            created_at=s.created_at,
+            updated_at=s.updated_at,
+        )
+        for s in db.scalars(query)
+    ]
+
+
+@router.get("/{submission_id}")
+def get_submission(submission_id: uuid.UUID, db: DbSession, user: CurrentUser) -> SubmissionOut:
+    return SubmissionOut.model_validate(visible_submission(db, submission_id, user))
+
+
+@router.patch("/{submission_id}/fields")
+def edit_fields(
+    submission_id: uuid.UUID,
+    body: EditFieldsRequest,
+    db: DbSession,
+    user: CurrentUser,
+    settings: AppSettings,
+) -> SubmissionOut:
+    """Correct extracted values during review. Checks are re-run."""
+    changes = [review.FieldChange(c.field, c.value, c.reason) for c in body.changes]
+    submission = review.edit_fields(db, submission_id, user, changes, settings)
     return SubmissionOut.model_validate(submission)
+
+
+@router.post("/{submission_id}/queries")
+def raise_queries(
+    submission_id: uuid.UUID,
+    body: RaiseQueriesRequest,
+    db: DbSession,
+    user: CurrentUser,
+    settings: AppSettings,
+) -> SubmissionOut:
+    """Ask the submitter about specific fields instead of rejecting the whole submission."""
+    queries = [review.QueryRequest(q.field, q.question) for q in body.queries]
+    submission = review.raise_queries(db, submission_id, user, queries, settings)
+    return SubmissionOut.model_validate(submission)
+
+
+@router.post("/{submission_id}/answers")
+def answer_queries(
+    submission_id: uuid.UUID,
+    body: AnswerQueriesRequest,
+    db: DbSession,
+    user: CurrentUser,
+    settings: AppSettings,
+) -> SubmissionOut:
+    """Answer every open query, optionally correcting the value. Returns to the same stage."""
+    answers = [review.Answer(a.query_id, a.response, a.corrected_value) for a in body.answers]
+    submission = review.answer_queries(db, submission_id, user, answers, settings)
+    return SubmissionOut.model_validate(submission)
+
+
+@router.post("/{submission_id}/decision")
+def decide(
+    submission_id: uuid.UUID,
+    body: DecisionRequest,
+    db: DbSession,
+    user: CurrentUser,
+    settings: AppSettings,
+) -> SubmissionOut:
+    """Approve (next stage, or final approval) or reject (needs a reason; final)."""
+    approve = body.decision == "approve"
+    submission = review.decide(db, submission_id, user, approve, body.comment, settings)
+    return SubmissionOut.model_validate(submission)
+
+
+@router.post("/{submission_id}/retry-extraction")
+def retry_extraction(
+    submission_id: uuid.UUID,
+    db: DbSession,
+    admin: AdminUser,
+    settings: AppSettings,
+    enqueue: Enqueue,
+) -> SubmissionOut:
+    """Re-queue a failed submission, or one stuck in UPLOADED (e.g. after a broker outage)."""
+    submission = review.retry_extraction(db, submission_id, admin, enqueue, settings)
+    return SubmissionOut.model_validate(submission)
+
+
+@router.get("/{submission_id}/audit")
+def audit_trail(submission_id: uuid.UUID, db: DbSession, user: CurrentUser) -> list[AuditEventOut]:
+    """Full history, oldest first. Staff see any submission; submitters see their own."""
+    visible_submission(db, submission_id, user)
+    events = db.scalars(
+        select(AuditEvent).where(AuditEvent.submission_id == submission_id).order_by(AuditEvent.seq)
+    )
+    return [AuditEventOut.model_validate(e) for e in events]
 
 
 @router.get("/{submission_id}/attempts")
 def list_extraction_attempts(
-    submission_id: uuid.UUID,
-    db: DbSession,
-    _admin: Annotated[User, Depends(require_roles(Role.ADMIN))],
+    submission_id: uuid.UUID, db: DbSession, _admin: AdminUser
 ) -> list[ExtractionAttemptOut]:
     """Admin audit trail: every LLM call for this submission with tokens, cost and latency."""
     if db.get(Submission, submission_id) is None:

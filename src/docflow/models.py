@@ -5,10 +5,13 @@ from enum import StrEnum
 from typing import Any
 
 from sqlalchemy import (
+    BigInteger,
     CheckConstraint,
     DateTime,
     Enum,
     ForeignKey,
+    Identity,
+    Index,
     Integer,
     MetaData,
     Numeric,
@@ -16,9 +19,14 @@ from sqlalchemy import (
     Text,
     UniqueConstraint,
     func,
+    text,
 )
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
+
+from docflow.roles import Role
+
+__all__ = ["Role"]  # re-exported: Role lives in docflow.roles so settings can use it
 
 # Predictable constraint names, so later migrations can alter or drop them by name.
 NAMING_CONVENTION = {
@@ -43,15 +51,14 @@ def created_at_column() -> Mapped[datetime]:
     return mapped_column(DateTime(timezone=True), server_default=func.now())
 
 
+def event_time_column() -> Mapped[datetime]:
+    """clock_timestamp() is the time of the insert itself. now() would give every row written in
+    one transaction the same time (the transaction's start)."""
+    return mapped_column(DateTime(timezone=True), server_default=func.clock_timestamp())
+
+
 def updated_at_column() -> Mapped[datetime]:
     return mapped_column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
-
-
-class Role(StrEnum):
-    SUBMITTER = "submitter"
-    REVIEWER = "reviewer"
-    APPROVER = "approver"
-    ADMIN = "admin"
 
 
 class SubmissionStatus(StrEnum):
@@ -83,7 +90,10 @@ class User(Base):
 class Submission(Base):
     __tablename__ = "submissions"
     # A retried upload with the same Idempotency-Key from the same user maps to one submission.
-    __table_args__ = (UniqueConstraint("submitter_id", "idempotency_key"),)
+    __table_args__ = (
+        UniqueConstraint("submitter_id", "idempotency_key"),
+        Index("ix_submissions_status_stage", "status", "stage"),  # work-queue listing
+    )
 
     id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
     submitter_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.id"))
@@ -93,6 +103,10 @@ class Submission(Base):
     stage: Mapped[int | None] = mapped_column(Integer)
     fields: Mapped[dict[str, Any] | None] = mapped_column(JSONB)
     flags: Mapped[list[dict[str, str]] | None] = mapped_column(JSONB)
+    # Field paths changed by a person. They have no source quote, so grounding skips them.
+    human_edited_fields: Mapped[list[str]] = mapped_column(
+        JSONB, default=list, server_default=text("'[]'::jsonb")
+    )
     idempotency_key: Mapped[str | None] = mapped_column(String(255))
     failure_reason: Mapped[str | None] = mapped_column(Text)
     # When a worker claimed this submission for extraction. The claim is a lease: if the worker
@@ -102,6 +116,9 @@ class Submission(Base):
     updated_at: Mapped[datetime] = updated_at_column()
 
     document: Mapped["Document"] = relationship(back_populates="submission")
+    queries: Mapped[list["FieldQuery"]] = relationship(
+        back_populates="submission", order_by="[FieldQuery.created_at, FieldQuery.id]"
+    )
 
 
 class Document(Base):
@@ -115,6 +132,8 @@ class Document(Base):
     sha256: Mapped[str] = mapped_column(String(64))
     size_bytes: Mapped[int] = mapped_column(Integer)
     page_count: Mapped[int | None] = mapped_column(Integer)  # set by the worker
+    # The PDF's text layer, kept so checks can be re-run after edits without re-reading the PDF.
+    text_content: Mapped[str | None] = mapped_column(Text)
     created_at: Mapped[datetime] = created_at_column()
 
     submission: Mapped[Submission] = relationship(back_populates="document")
@@ -147,3 +166,51 @@ class ExtractionAttempt(Base):
     response_id: Mapped[str | None] = mapped_column(String(255))
     error: Mapped[str | None] = mapped_column(Text)
     created_at: Mapped[datetime] = created_at_column()
+
+
+class QueryStatus(StrEnum):
+    OPEN = "open"
+    ANSWERED = "answered"
+
+
+class FieldQuery(Base):
+    """A reviewer's question about one field, answered by the submitter."""
+
+    __tablename__ = "field_queries"
+
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
+    submission_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("submissions.id", ondelete="CASCADE"), index=True
+    )
+    stage: Mapped[int] = mapped_column(Integer)
+    field: Mapped[str] = mapped_column(String(100))
+    question: Mapped[str] = mapped_column(Text)
+    status: Mapped[QueryStatus] = mapped_column(
+        pg_enum(QueryStatus, "query_status"), default=QueryStatus.OPEN
+    )
+    raised_by: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.id"))
+    response: Mapped[str | None] = mapped_column(Text)
+    corrected_value: Mapped[str | None] = mapped_column(Text)
+    answered_by: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("users.id"))
+    answered_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    created_at: Mapped[datetime] = event_time_column()
+
+    submission: Mapped[Submission] = relationship(back_populates="queries")
+
+
+class AuditEvent(Base):
+    """Append-only history. A database trigger rejects UPDATE, DELETE and TRUNCATE, and the
+    foreign key does not cascade, so a submission with history cannot be deleted either."""
+
+    __tablename__ = "audit_events"
+
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
+    # Strict insertion order, generated by the database. Timestamps alone can tie.
+    seq: Mapped[int] = mapped_column(BigInteger, Identity(always=True), unique=True)
+    submission_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("submissions.id"), index=True)
+    actor_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("users.id"))  # None = system
+    # A string, not a database enum, so new actions need no migration; AuditAction validates it.
+    action: Mapped[str] = mapped_column(String(50))
+    stage: Mapped[int | None] = mapped_column(Integer)
+    details: Mapped[dict[str, Any]] = mapped_column(JSONB, default=dict)
+    created_at: Mapped[datetime] = event_time_column()

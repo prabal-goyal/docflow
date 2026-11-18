@@ -51,10 +51,17 @@ REQUIRED_FIELDS = (
 )
 
 
-def run_checks(invoice: InvoiceExtraction, pdf_text: str, today: date) -> list[Flag]:
+def run_checks(
+    invoice: InvoiceExtraction,
+    pdf_text: str,
+    today: date,
+    human_edited: frozenset[str] = frozenset(),
+) -> list[Flag]:
+    """human_edited: field paths a person entered. They have no source quote, so grounding
+    skips them; every other check still applies."""
     flags = [
         *check_required(invoice),
-        *check_grounding(invoice, pdf_text),
+        *check_grounding(invoice, pdf_text, human_edited),
         *check_formats(invoice, today),
     ]
     flags.extend(check_arithmetic(invoice, already_flagged={f.field for f in flags}))
@@ -92,7 +99,9 @@ def normalise_text(text: str) -> str:
     return WHITESPACE.sub(" ", text).strip().casefold()
 
 
-def check_grounding(invoice: InvoiceExtraction, pdf_text: str) -> Iterator[Flag]:
+def check_grounding(
+    invoice: InvoiceExtraction, pdf_text: str, human_edited: frozenset[str] = frozenset()
+) -> Iterator[Flag]:
     """Each quote must appear in the PDF's text layer, or the value may be invented."""
     haystack = normalise_text(pdf_text)
     if len(haystack) < MIN_TEXT_CHARS:
@@ -103,7 +112,7 @@ def check_grounding(invoice: InvoiceExtraction, pdf_text: str) -> Iterator[Flag]
         )
         return
     for path, field in all_fields(invoice):
-        if field.value is None:
+        if field.value is None or path in human_edited:
             continue
         if not field.source_quote:
             yield Flag(path, FlagCode.NOT_GROUNDED, "No source quote was given for this value")

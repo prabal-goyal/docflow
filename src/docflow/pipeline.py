@@ -12,6 +12,7 @@ from enum import Enum, auto
 from sqlalchemy import func, or_, select, update
 from sqlalchemy.orm import Session
 
+from docflow.audit import AuditAction, record_event
 from docflow.checks import run_checks
 from docflow.config import Settings
 from docflow.extraction import (
@@ -128,6 +129,7 @@ def process_submission(
         pdf = storage.get(submission.document.storage_key)
         info = inspect_pdf(pdf, settings.max_pdf_pages)
         submission.document.page_count = info.page_count
+        submission.document.text_content = info.text
         extractor = get_extractor()
     except (InvalidPdfError, PermanentExtractionError) as error:
         fail(db, submission, str(error))
@@ -159,6 +161,14 @@ def process_submission(
     submission.stage = FIRST_REVIEW_STAGE
     submission.failure_reason = None
     submission.claimed_at = None
+    record_event(
+        db,
+        submission_id,
+        AuditAction.EXTRACTED,
+        actor_id=None,
+        stage=FIRST_REVIEW_STAGE,
+        details={"flag_count": len(flags), "model": result.usage.model if result.usage else None},
+    )
     db.commit()
     logger.info("Submission %s extracted with %d flag(s)", submission_id, len(flags))
 
@@ -168,6 +178,9 @@ def fail(db: Session, submission: Submission, reason: str) -> None:
     submission.status = SubmissionStatus.EXTRACTION_FAILED
     submission.failure_reason = reason
     submission.claimed_at = None
+    record_event(
+        db, submission.id, AuditAction.EXTRACTION_FAILED, actor_id=None, details={"reason": reason}
+    )
     db.commit()
 
 
@@ -184,9 +197,18 @@ def release(db: Session, submission_id: uuid.UUID) -> None:
 def give_up(db: Session, submission_id: uuid.UUID, reason: str) -> None:
     """Marks a submission failed after its retries are exhausted. Not applied to a submission
     another worker is actively extracting."""
-    db.execute(
+    failed = db.scalar(
         update(Submission)
         .where(Submission.id == submission_id, Submission.status == SubmissionStatus.UPLOADED)
         .values(status=SubmissionStatus.EXTRACTION_FAILED, failure_reason=reason)
+        .returning(Submission.id)
     )
+    if failed is not None:
+        record_event(
+            db,
+            submission_id,
+            AuditAction.EXTRACTION_FAILED,
+            actor_id=None,
+            details={"reason": reason},
+        )
     db.commit()

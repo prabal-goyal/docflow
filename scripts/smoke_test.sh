@@ -55,4 +55,22 @@ if [[ "$STATUS" != "$EXPECTED_STATUS" || "$REASON" != *"$EXPECTED_REASON"* || "$
   echo "FAILED: expected status=$EXPECTED_STATUS, reason containing '$EXPECTED_REASON', pages=1"
   exit 1
 fi
+
+if [[ "$STATUS" == "extraction_failed" ]]; then
+  echo "5. Admin retries the failed extraction"
+  curl -fsS -o /dev/null -X POST "$BASE_URL/submissions/$SUBMISSION_ID/retry-extraction" \
+    -H "Authorization: Bearer $ADMIN_TOKEN"
+  for _ in $(seq 1 30); do
+    STATUS=$(curl -fsS "$BASE_URL/submissions/$SUBMISSION_ID" -H "Authorization: Bearer $TOKEN" | json "['status']")
+    if [[ "$STATUS" != "uploaded" && "$STATUS" != "extracting" ]]; then break; fi
+    sleep 1
+  done
+  ACTIONS=$(curl -fsS "$BASE_URL/submissions/$SUBMISSION_ID/audit" -H "Authorization: Bearer $ADMIN_TOKEN" \
+    | python3 -c "import sys, json; print(','.join(e['action'] for e in json.load(sys.stdin)))")
+  echo "   status=$STATUS audit=$ACTIONS"
+  if [[ "$ACTIONS" != "uploaded,extraction_failed,extraction_retried,extraction_failed" ]]; then
+    echo "FAILED: unexpected audit trail"
+    exit 1
+  fi
+fi
 echo "Smoke test passed"

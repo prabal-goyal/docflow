@@ -4,7 +4,7 @@ AI document intake and approval API. Upload a commercial invoice; an LLM extract
 deterministic checks flag anything suspicious, reviewers approve in stages with field-level queries,
 and the customer's system is notified through signed webhooks.
 
-Status: **M2 (upload and AI extraction)** done; review workflow (M3) next. See [docs/PLAN.md](docs/PLAN.md) for the full plan.
+Status: **M3 (review workflow)** done; webhooks (M4) next. See [docs/PLAN.md](docs/PLAN.md) for the full plan.
 
 ## Run with Docker
 
@@ -94,8 +94,8 @@ for what is production-grade and what is deliberately left out.
 
 - `GET /submissions/{id}/attempts` (admin): every LLM call with tokens, estimated cost and latency.
 
-Lifecycle so far: `uploaded -> extracting -> in_review (stage 1)` or `extraction_failed` with a
-`failure_reason`. See [docs/decisions/0002-background-extraction.md](docs/decisions/0002-background-extraction.md)
+Lifecycle: `uploaded -> extracting -> in_review (stage 1)` or `extraction_failed` with a
+`failure_reason`, then the review workflow below. See [docs/decisions/0002-background-extraction.md](docs/decisions/0002-background-extraction.md)
 for how duplicate deliveries, crashed workers and retries are handled.
 
 ## AI extraction
@@ -124,3 +124,21 @@ a stack on which `scripts/smoke_test.sh` has run:
 ```bash
 uv run python scripts/live_test.py   # calls OpenAI: costs real money (fractions of a cent per invoice on gpt-6-luna)
 ```
+
+## Review workflow
+
+`in_review` stage 1 (reviewer) -> stage 2 (approver) -> `approved`, or `rejected` at either stage.
+Stage roles are configurable (`DOCFLOW_APPROVAL_STAGES`).
+
+| Endpoint | Who | What |
+|---|---|---|
+| `GET /submissions?status=&stage=&awaiting_me=true` | everyone (submitters: own only) | Work queue, newest first |
+| `PATCH /submissions/{id}/fields` | role of the current stage | Edit values with a reason; checks re-run |
+| `POST /submissions/{id}/queries` | role of the current stage | Ask about specific fields -> `query_raised` |
+| `POST /submissions/{id}/answers` | the submitter | Answer all open queries, optionally correcting values; back to the same stage |
+| `POST /submissions/{id}/decision` | role of the current stage | `approve` (comment required if flags remain) or `reject` (reason required, final) |
+| `POST /submissions/{id}/retry-extraction` | admin | Re-queue a failed or stuck submission |
+| `GET /submissions/{id}/audit` | staff, and the submitter for their own | Append-only history |
+
+Admins cannot approve or reject, and nobody can review their own submission. See
+[docs/decisions/0004-review-workflow.md](docs/decisions/0004-review-workflow.md).

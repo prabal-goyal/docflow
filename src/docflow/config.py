@@ -2,8 +2,10 @@ from decimal import Decimal
 from functools import lru_cache
 from typing import Literal
 
-from pydantic import Field, SecretStr
+from pydantic import Field, SecretStr, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+from docflow.roles import Role
 
 MIN_JWT_SECRET_LENGTH = 32
 
@@ -35,6 +37,12 @@ class Settings(BaseSettings):
     max_upload_bytes: int = Field(default=10 * 1024 * 1024, gt=0)
     max_pdf_pages: int = Field(default=20, gt=0)
 
+    # The role that acts at each review stage, in order. A customer with more stages changes
+    # this list, not the code.
+    approval_stages: list[Role] = Field(default=[Role.REVIEWER, Role.APPROVER], min_length=1)
+    # An upload still UPLOADED after this long was probably never queued (broker outage).
+    stuck_upload_minutes: int = Field(default=10, gt=0)
+
     # Read from the standard OPENAI_API_KEY variable (no DOCFLOW_ prefix). Only the worker needs it.
     openai_api_key: SecretStr | None = Field(default=None, validation_alias="OPENAI_API_KEY")
     llm_model: str = "gpt-6-luna"
@@ -49,6 +57,17 @@ class Settings(BaseSettings):
         "gpt-6.1-sol": (Decimal("2.00"), Decimal("10.00")),
         "gpt-6-astra": (Decimal("10.00"), Decimal("50.00")),
     }
+
+    @field_validator("approval_stages")
+    @classmethod
+    def stages_are_review_roles(cls, stages: list[Role]) -> list[Role]:
+        # Separation of duties: submitters never review, admins never decide, and no role
+        # approves twice.
+        if any(role in (Role.SUBMITTER, Role.ADMIN) for role in stages):
+            raise ValueError("approval stages may only use review roles, not submitter or admin")
+        if len(set(stages)) != len(stages):
+            raise ValueError("each role may act at only one approval stage")
+        return stages
 
 
 @lru_cache
