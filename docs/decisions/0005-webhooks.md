@@ -29,15 +29,13 @@ beat schedule triggers `dispatch_due` every 10 seconds; the worker sends whateve
 - **SSRF:** endpoints must be HTTPS and resolve only to public addresses (no private, loopback,
   link-local such as the cloud metadata service, CGNAT, multicast or IPv4-mapped private), checked
   at registration and again before every send.
-- **Residual risk:** the check resolves DNS separately from the HTTP client's own lookup, so a
-  DNS-rebinding attacker could in theory switch the address between the two. Production upgrade:
-  route webhook traffic through an egress proxy that enforces the same rules (e.g. Smokescreen) or
-  connect to the vetted IP directly.
+- **DNS rebinding (closed in M6):** deliveries now connect to an address the check approved,
+  with the hostname sent as SNI and `Host`, so the HTTP client never resolves the name a second
+  time. An egress proxy (e.g. Smokescreen) remains a defence-in-depth option.
 - `DOCFLOW_WEBHOOK_ALLOW_PRIVATE_TARGETS=true` disables these checks for the local mock receiver
   only. It is set in docker-compose and must never be set in production.
-- **Signing secrets are stored unencrypted** in `webhook_endpoints`, because signing needs the
-  plain value. Mitigations now: shown once, rotatable, never returned by list endpoints.
-  Production upgrade (M6): encrypt at rest with AWS KMS.
+- **Signing secrets are encrypted with AWS KMS** (M6, `secret_cipher.py`, encryption context
+  bound to their purpose). They are shown once, rotatable, and never returned by list endpoints.
 
 ## Known limitations
 

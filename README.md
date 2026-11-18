@@ -4,7 +4,7 @@ AI document intake and approval API. Upload a commercial invoice; an LLM extract
 deterministic checks flag anything suspicious, reviewers approve in stages with field-level queries,
 and the customer's system is notified through signed webhooks.
 
-Status: **M5 (evaluation)** done; AWS deployment (M6) next. See [docs/PLAN.md](docs/PLAN.md) for the full plan.
+Status: **M6 (AWS deployment)** live at https://35-154-192-199.sslip.io; handover docs and demo (M7) next. See [docs/PLAN.md](docs/PLAN.md) for the full plan.
 
 ## Run with Docker
 
@@ -173,3 +173,13 @@ uv run python -m evals.harness --run-id x --dry-run          # cost estimate bef
 uv run python -m evals.harness --run-id x --configs luna-medium --repeats 1   # PAID
 uv run python -m evals.score evals/runs/x                    # free, re-scores saved outputs
 ```
+
+## Production on AWS
+
+DocFlow runs on AWS (`ap-south-1`): Terraform in [infra/](infra/), deploys from GitHub Actions on
+every merge to `main` (OIDC, no stored AWS keys), HTTPS through Caddy, secrets in SSM Parameter
+Store, webhook secrets encrypted with KMS, logs in CloudWatch, nightly backups to S3.
+
+- [docs/deployment-guide.md](docs/deployment-guide.md): from an empty AWS account to a running deployment
+- [docs/runbook.md](docs/runbook.md): deploy, roll back, logs, backups, users, secret rotation
+- [docs/decisions/0007-aws-deployment.md](docs/decisions/0007-aws-deployment.md): what is production-grade, what is simplified, and the upgrade path
