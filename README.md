@@ -15,8 +15,9 @@ system with signed webhooks.
 | **Measured** | Held-out eval on synthetic invoices: 100% field accuracy and 100% of planted problems caught, at about $0.0007 per invoice and 10 s median. The cheapest model matched ones 7-16x more expensive |
 | **Human review** | Two approval stages with separation of duties, field-level queries back to the submitter, and an append-only audit log enforced by a Postgres trigger |
 | **Integration** | Transactional outbox, HMAC-signed webhooks with retries over about 15 hours, SSRF and DNS-rebinding protection, KMS-encrypted signing secrets |
+| **AI agents (MCP)** | An MCP server lets Claude Code or other agents list, read, query and upload invoices through the same authenticated API, so every agent action passes the role checks and lands in the audit log. Uploads are confined to one folder; approve/reject is off unless enabled |
 | **Production** | AWS through Terraform, deploys from GitHub Actions with OIDC (no stored keys), no SSH, nightly backups with a tested restore, one-command rollback, and a second environment rebuilt from the deployment guide |
-| **Quality** | 735 tests, ruff, mypy (strict), migration drift check, Docker smoke test in CI |
+| **Quality** | 768 tests, ruff, mypy (strict), migration drift check, Docker smoke test in CI |
 
 ## How it works
 
@@ -204,6 +205,41 @@ Admin endpoints: `POST/GET /webhooks`, `PATCH /webhooks/{id}`, `POST /webhooks/{
 
 For receivers: [docs/integration-guide.md](docs/integration-guide.md) (signature verification in
 Python and Node.js). Design: [docs/decisions/0005-webhooks.md](docs/decisions/0005-webhooks.md).
+
+## AI agents (MCP)
+
+`docflow-mcp` is an MCP server that gives AI agents (Claude Code, Claude Desktop, Cursor) tools to
+work with DocFlow, for example "which invoices need my review, and what is wrong with each?". It
+is only a client of the API above: it logs in as a normal DocFlow user, so the agent can never do
+more than that account, and everything it does is in the audit log.
+
+| Tool | What it does |
+|---|---|
+| `list_submissions` | Newest first, filter by status or "awaiting me" |
+| `get_submission` | Fields with source quotes, flags, queries |
+| `get_audit_log` | Full history of a submission |
+| `raise_query` | Ask the submitter about one field |
+| `list_invoice_files`, `upload_invoice` | Upload a PDF from one configured folder (only if `DOCFLOW_MCP_UPLOAD_DIR` is set) |
+| `record_decision` | Approve or reject (only if `DOCFLOW_MCP_ALLOW_DECISIONS=true`; marked destructive) |
+
+Setup: create a dedicated, least-privilege DocFlow user for the agent (for example a reviewer),
+then put its credentials in `.env.mcp` (gitignored):
+
+```bash
+DOCFLOW_MCP_URL=http://localhost:8000
+DOCFLOW_MCP_EMAIL=agent@example.com
+DOCFLOW_MCP_PASSWORD=...
+# DOCFLOW_MCP_UPLOAD_DIR=/path/to/invoices   # enables uploads from this folder only
+```
+
+```bash
+uv sync --group mcp
+claude mcp add docflow -- /path/to/docflow/scripts/docflow-mcp.sh      # Claude Code
+uv run --group mcp --env-file .env.mcp python scripts/mcp_smoke.py     # check over stdio
+```
+
+Security model, prompt-injection handling and limitations:
+[docs/decisions/0008-mcp-server.md](docs/decisions/0008-mcp-server.md).
 
 ## Evaluation
 

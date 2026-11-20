@@ -127,11 +127,52 @@ verification sample), `docs/runbook.md`, `docs/decisions/`.
 | M5 | Eval | 12-14 | `evals/results.md` with accuracy, flag precision/recall, 2-model comparison |
 | M6 | AWS deploy | 15-18 | Live on HTTPS; merge to main auto-deploys; second clean deploy from the guide |
 | M7 | Docs and demo | 19-21 | Handover docs, 3-minute demo video, resume bullet |
-| Stretch | MCP server, Terraform, small review UI | after | Only when M0-M7 are done |
+| M8 | MCP server | 22-24 | An agent in Claude Code lists, reads, uploads and queries invoices through the API; tests and CI green |
+| Stretch | Small review UI | after | Only when M0-M8 are done |
 
 Infrastructure is added in the milestone that first uses it (Postgres in M1, Redis/SeaweedFS in M2).
 M2 is split into M2a (upload, storage, worker plumbing with a fake extractor) and M2b (OpenAI
 extraction and checks).
+
+## M8: MCP server
+
+Lets an AI agent (Claude Code, Claude Desktop, Cursor) work with DocFlow through MCP tools, for
+example "which invoices are flagged this week, and why?".
+
+**Shape.** A separate package, `src/docflow_mcp/`, in this repo. It is a client of DocFlow's HTTP
+API and never touches the database, so login, role checks, rate limits and the audit log apply to
+every agent action exactly as they do to a person. Same repo because it changes together with the
+API it calls and shares CI; separate package and optional dependency group so the API's Docker
+image does not ship the MCP SDK. SDK: the official `mcp` package, v2 (`MCPServer`), pinned
+`>=2,<3`.
+
+**Tools (v1).**
+
+| Tool | API call | Kind |
+|---|---|---|
+| `list_submissions(status?, limit?)` | `GET /submissions` | read |
+| `get_submission(id)` | `GET /submissions/{id}` (fields, source quotes, flags) | read |
+| `get_audit_log(id)` | `GET /submissions/{id}/audit` | read |
+| `upload_invoice(file_path)` | `POST /submissions` | write |
+| `raise_query(id, field, question)` | `POST /submissions/{id}/queries` | write |
+| `record_decision(id, decision, reason)` | `POST /submissions/{id}/decision` | write, destructive |
+
+**Decisions (record in 0008).**
+
+- Transport: stdio only in v1 (runs on the user's machine next to the agent). Remote HTTP needs
+  OAuth and is out of scope.
+- Auth: the server logs in as a DocFlow user from environment variables. Use a dedicated
+  least-privilege user, never the admin. Tokens never appear in tool output or logs.
+- `record_decision` is marked destructive so clients ask the human first; the API still decides
+  who may approve.
+- Invoice text is untrusted: tool results label document content as data, and no tool acts on
+  instructions found in a document.
+- Errors: HTTP 401/403/404/409/422/429 become short messages that tell the model what to do next;
+  anything else is logged to stderr and returned as a generic failure.
+
+**Done when.** Each tool has unit tests against a mocked HTTP layer; one end-to-end test runs
+against the local Docker stack; CI green; README section, decision 0008, a short demo recording,
+and a resume bullet.
 
 ## Testing
 

@@ -25,7 +25,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - uses: astral-sh/setup-uv@v10.3.3
-      - run: uv sync --frozen
+      - run: uv sync --frozen --group mcp
       - run: uv run ruff check .
       - run: uv run ruff format --check .
       - run: uv run mypy src tests alembic evals
